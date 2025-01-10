@@ -1,0 +1,24 @@
+{
+  "name": "zss-engine",
+  "version": "0.1.0",
+  "description": "Zero-runtime Style Sheet Engine",
+  "keywords": [
+    "zero-runtime",
+    "style-sheet",
+    "engine",
+    "css-in-js"
+  ],
+  "author": "Refirst",
+  "repository": "github:zss-in-js/zss-engine",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "devDependencies": {
+    "@types/node": "^22.8.5",
+    "@types/react": "^19.0.4",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "csstype": "^3.1.3"
+  }
+}
