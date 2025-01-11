@@ -60,7 +60,7 @@ export function transpiler(object: ClassesStyle | CustomHTMLType | VarsDefinitio
           const kebabPseudoSelector = camelToKebabCase(property.replace('&', ''));
           const styles = stringConverter(className + kebabPseudoSelector, value, indentLevel);
           Object.assign(classSelector, styles);
-        } else if (property.startsWith('@media')) {
+        } else if (property.startsWith('@media') || property.startsWith('@container')) {
           const mediaRule = property;
           let nestedRules = '';
           let regularRules = '';
