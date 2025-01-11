@@ -5,7 +5,7 @@
   "keywords": [
     "zero-runtime",
     "style-sheet",
-    "engine",
+    "runtime",
     "css-in-js"
   ],
   "author": "Refirst",
@@ -15,7 +15,6 @@
   "typings": "dist/index.d.ts",
   "devDependencies": {
     "@types/node": "^22.8.5",
-    "@types/react": "^19.0.4",
     "typescript": "^5.6.3"
   },
   "dependencies": {
