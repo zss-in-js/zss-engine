@@ -1,7 +1,6 @@
-import { JSX } from 'react';
 import type { CustomProperties, MediaQuery } from '../common/css-properties';
 
-type JSXType = keyof JSX.IntrinsicElements | '*' | ':root';
+type JSXType = keyof HTMLElementTagNameMap | '*' | ':root';
 type HTMLType = {
   [K in JSXType]: CustomProperties;
 };
