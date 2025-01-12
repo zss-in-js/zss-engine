@@ -1,4 +1,4 @@
-import type { CSSVariableValue } from './css-variables';
+import type { CSSVariableValue } from '../main/vars';
 import type { Properties, Property } from 'csstype';
 
 type ColorValue = Exclude<Property.Color, '-moz-initial'> | (string & {});
