@@ -1,4 +1,4 @@
-export type VarsDefinition = Record<string, string | Record<string, string>>;
+export type VarsDefinition = Record<string, string | number | Record<string, string | number>>;
 
 type CSSVariableKey = `--${string}`;
 export type CSSVariableValue = `var(${CSSVariableKey})`;
