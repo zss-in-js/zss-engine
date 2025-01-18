@@ -3,7 +3,7 @@ import type { Properties, Property } from 'csstype';
 
 type ColorValue = Exclude<Property.Color, '-moz-initial'> | (string & {});
 type CSSColorProperty = Exclude<ColorValue, SystemColorKeyword>;
-
+//28
 type SystemColorKeyword =
   | 'ActiveBorder'
   | 'ActiveCaption'
@@ -35,11 +35,11 @@ type SystemColorKeyword =
   | 'WindowText';
 
 type ExcludeMozInitial<T> = Exclude<T, '-moz-initial'>;
-type PropertiesWithoutMozInitial = {
-  [K in keyof Properties]: ExcludeMozInitial<Properties[K]>;
-};
-type CSSProperties = Omit<PropertiesWithoutMozInitial, 'fontSize'> & {
-  fontSize: PropertiesWithoutMozInitial['fontSize'] | number;
+
+type CSSTypeProperties = Properties<number | (string & {})>;
+
+type CSSProperties = {
+  [K in keyof CSSTypeProperties]: ExcludeMozInitial<CSSTypeProperties[K]>;
 };
 
 type BaseCSSProperties = {
