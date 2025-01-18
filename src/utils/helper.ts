@@ -5,7 +5,7 @@ export const isDevelopment = process.env.NODE_ENV === 'development';
 export const isDevAndTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 export const isDevServer = isDevelopment && isServer;
 
-const exception = ['line-height', 'font-weight', 'opacity', 'scale', 'z-index'];
+const exception = ['line-height', 'font-weight', 'opacity', 'scale', 'z-index', 'column-count', 'order', 'orphans', 'widows'];
 
 export const applyCssValue = (value: string | number, cssProp: string): string => {
   if (typeof value === 'number') {
