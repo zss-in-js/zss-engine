@@ -1,11 +1,11 @@
 'use server';
 import { isServer } from './helper';
-import { styleText } from 'node:util';
 
 export const build = async (styleSheet: string, filePath: string, global?: string) => {
   if (!isServer) return;
 
   const fs = require('fs');
+  const { styleText } = require('util');
 
   const message = global === '--global' ? styleText('underline', `✅Generated global CSS\n\n`) : styleText('underline', `✅Generated create CSS\n\n`);
   try {
