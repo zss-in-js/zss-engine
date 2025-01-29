@@ -78,7 +78,7 @@ type ColonType = {
 
 export type MediaQuery = `@media ${string}`;
 type MediaQueryType = {
-  [K in MediaQuery]: CommonProperties | ColonType;
+  [K in MediaQuery]: CommonProperties | ColonType | AndStringType;
 };
 
 export type CustomProperties = CommonProperties | ColonType | AndStringType | MediaQueryType;
