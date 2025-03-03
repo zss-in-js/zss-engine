@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "declaration": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "dom"],
     "moduleResolution": "node",
