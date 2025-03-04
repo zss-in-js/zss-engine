@@ -20,9 +20,14 @@ type ConsecutiveType = {
   [K in Consecutive]: CustomProperties;
 };
 
-type Pseudo = `${JSXType}:${string}`;
-type PseudoType = {
-  [K in Pseudo]: CustomProperties;
+type PseudoClass = `${JSXType}:${string}`;
+type PseudoClassType = {
+  [K in PseudoClass]: CustomProperties;
+};
+
+type PseudoElement = `::${string}`;
+type PseudoElementType = {
+  [K in PseudoElement]: CustomProperties;
 };
 
 type KeyframeSelector = 'from' | 'to' | `${number}%`;
@@ -39,4 +44,12 @@ type MediaQueryHTMLType = {
   [K in MediaQuery]: CustomHTMLType;
 };
 
-export type CustomHTMLType = HTMLType | ClassNameType | AttributeType | ConsecutiveType | PseudoType | KeyframesType | MediaQueryHTMLType;
+export type CustomHTMLType =
+  | HTMLType
+  | ClassNameType
+  | AttributeType
+  | ConsecutiveType
+  | PseudoClassType
+  | PseudoElementType
+  | KeyframesType
+  | MediaQueryHTMLType;
