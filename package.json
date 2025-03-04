@@ -8,6 +8,7 @@
     "runtime",
     "css-in-js"
   ],
+  "private": true,
   "author": "Refirst",
   "repository": "github:zss-in-js/zss-engine",
   "license": "MIT",
