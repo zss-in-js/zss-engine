@@ -24,6 +24,10 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "types/index.d.ts",
+  "files": [
+    "dist/",
+    "types/"
+  ],
   "scripts": {
     "build": "shx rm -rf dist types && pnpm esm && pnpm cjs",
     "cjs": "tsc --project tsconfig.cjs.json",
