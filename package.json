@@ -29,9 +29,9 @@
     "types/"
   ],
   "scripts": {
-    "build": "shx rm -rf dist types && pnpm esm && pnpm cjs",
+    "build": "rimraf dist types && pnpm esm && pnpm cjs",
     "cjs": "tsc --project tsconfig.cjs.json",
-    "esm": "tsc --project tsconfig.esm.json && node build.esm.js",
+    "esm": "tsc --project tsconfig.esm.json && node esm.create.mjs",
     "test": "jest"
   },
   "dependencies": {
@@ -43,7 +43,7 @@
     "fast-glob": "^3.3.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "shx": "^0.3.4",
+    "rimraf": "^6.0.1",
     "ts-jest": "^29.2.6",
     "typescript": "^5.6.3"
   }
