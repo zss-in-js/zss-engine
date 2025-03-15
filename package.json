@@ -1,6 +1,6 @@
 {
   "name": "zss-engine",
-  "version": "0.2.9",
+  "version": "0.2.11",
   "description": "Zero-runtime Style Sheet Engine",
   "keywords": [
     "zero-runtime",
@@ -39,12 +39,12 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.8.5",
+    "@types/node": "^22.13.10",
     "fast-glob": "^3.3.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.6",
-    "typescript": "^5.6.3"
+    "typescript": "^5.8.2"
   }
 }
