@@ -3,7 +3,7 @@ import type { Properties, Property } from 'csstype';
 
 type ColorValue = Exclude<Property.Color, '-moz-initial'> | (string & {});
 type CSSColorProperty = Exclude<ColorValue, SystemColorKeyword>;
-//28
+
 type SystemColorKeyword =
   | 'ActiveBorder'
   | 'ActiveCaption'

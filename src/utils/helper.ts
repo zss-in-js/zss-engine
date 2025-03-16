@@ -3,7 +3,6 @@ const isDocumentDefined = typeof document !== 'undefined';
 export const isServer = !isWindowDefined || !isDocumentDefined;
 export const isDevelopment = process.env.NODE_ENV === 'development';
 export const isDevAndTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
-export const isDevServer = isDevelopment && isServer;
 
 const exception = ['line-height', 'font-weight', 'opacity', 'scale', 'z-index', 'column-count', 'order', 'orphans', 'widows'];
 
