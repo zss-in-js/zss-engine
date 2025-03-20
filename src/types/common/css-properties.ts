@@ -1,4 +1,4 @@
-import type { CSSVariableValue } from '../main/vars';
+import type { CSSVariableValue, CSSVariableProperty } from '../main/vars';
 import type { Properties, Property } from 'csstype';
 
 type ColorValue = Exclude<Property.Color, '-moz-initial'> | (string & {});
@@ -81,4 +81,4 @@ type MediaQueryType = {
   [K in MediaQuery]: CommonProperties | ColonType | AndStringType;
 };
 
-export type CustomProperties = CommonProperties | ColonType | AndStringType | MediaQueryType;
+export type CustomProperties = CommonProperties | ColonType | CSSVariableProperty | AndStringType | MediaQueryType;
