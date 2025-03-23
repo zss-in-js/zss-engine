@@ -1,4 +1,4 @@
-export type { CustomProperties, MediaQuery } from './types/common/css-properties';
+export type { CustomProperties } from './types/common/css-properties';
 export type { CreateStyle, ClassesStyle, ReturnType } from './types/main/create';
 export type { KeyframesDefinition, CustomHTMLType } from './types/main/global';
 export type { VarsDefinition, VarsTransformed, CSSVariableProperty } from './types/main/vars';
