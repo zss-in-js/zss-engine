@@ -1,6 +1,6 @@
-import { camelToKebabCase, applyCssValue } from './helper';
-import type { PropertyType } from '../types/common/css-property';
-import type { ClassesStyle, CustomHTMLType, VarsDefinition, CustomProperties } from '../index';
+import { camelToKebabCase, applyCssValue } from './helper.js';
+import type { PropertyType } from '../types/common/css-property.js';
+import type { ClassesStyle, CustomHTMLType, VarsDefinition, CustomProperties } from '../index.js';
 
 const createKeyframes = (property: string, content: PropertyType) => {
   let keyframesRules = `${property} {\n`;

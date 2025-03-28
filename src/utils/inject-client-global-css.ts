@@ -1,4 +1,4 @@
-import { isServer } from '..';
+import { isServer } from '../index.js';
 
 export function injectClientGlobalCSS(sheet: string, scoped: string) {
   if (isServer) return;

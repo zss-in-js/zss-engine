@@ -1,4 +1,4 @@
-import { ClassesStyle, KeyframesDefinition, VarsDefinition } from '..';
+import { ClassesStyle, KeyframesDefinition, VarsDefinition } from '../index.js';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 

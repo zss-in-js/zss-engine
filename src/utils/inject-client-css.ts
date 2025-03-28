@@ -1,4 +1,4 @@
-import { isServer } from '..';
+import { isServer } from '../index.js';
 
 const styleSheets: Record<string, HTMLStyleElement> = {};
 const hashCache: Record<string, string> = {};

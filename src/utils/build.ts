@@ -1,5 +1,5 @@
 'use server';
-import { isServer } from './helper';
+import { isServer } from './helper.js';
 
 export const build = async (styleSheet: string, filePath: string, global?: string) => {
   if (!isServer) return;
