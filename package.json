@@ -1,6 +1,6 @@
 {
   "name": "zss-engine",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "description": "Zero-runtime Style Sheet Engine",
   "keywords": [
     "zero-runtime",
@@ -15,22 +15,21 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
     }
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "types/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "files": [
-    "dist/",
-    "types/"
+    "dist/"
   ],
   "scripts": {
-    "build": "rimraf dist types && pnpm esm && pnpm cjs",
+    "build": "rimraf dist && pnpm esm && pnpm cjs",
     "cjs": "tsc --project tsconfig.cjs.json",
-    "esm": "tsc --project tsconfig.esm.json && node esm.create.mjs",
+    "esm": "tsc --project tsconfig.esm.json",
     "test": "jest"
   },
   "dependencies": {
@@ -39,7 +38,6 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
-    "fast-glob": "^3.3.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "rimraf": "^6.0.1",
