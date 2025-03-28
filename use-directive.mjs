@@ -1,16 +1,7 @@
 import fs from 'fs/promises';
-import { globSync } from 'fs';
 
 (async () => {
-  const files = globSync('dist/**/*.js');
-
-  await Promise.all(
-    files.map(async file => {
-      const newPath = file.replace(/\.js$/, '.mjs');
-      await fs.rename(file, newPath);
-    })
-  );
-  const buildFile = './dist/utils/build.mjs';
+  const buildFile = './dist/esm/utils/build.js';
   try {
     let content = await fs.readFile(buildFile, 'utf-8');
     const lines = content.split('\n');
