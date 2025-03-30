@@ -3,8 +3,8 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "outDir": "./dist/esm",
     "declaration": true,
-    "declarationDir": "./dist/types",
-    "outDir": "./dist/esm"
+    "declarationDir": "./types"
   }
 }
