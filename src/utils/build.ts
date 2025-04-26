@@ -11,7 +11,7 @@ export const build = async (styleSheet: string, filePath: string, global?: strin
       const cssData = fs.readFileSync(filePath, 'utf-8');
       if (!cssData.includes(styleSheet)) {
         fs.appendFileSync(filePath, styleSheet, 'utf-8');
-        if (process.argv.includes('--log')) console.log(message + styleSheet);
+        if (process.argv.includes('--view')) console.log(message + styleSheet);
       }
     }
     return;
