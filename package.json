@@ -1,6 +1,6 @@
 {
   "name": "zss-engine",
-  "version": "0.2.28",
+  "version": "0.2.32",
   "description": "Zero-runtime StyleSheet Engine",
   "keywords": [
     "zero-runtime",
@@ -30,7 +30,8 @@
   "scripts": {
     "build": "rimraf dist types && pnpm esm && pnpm cjs",
     "cjs": "tsc --project tsconfig.cjs.json",
-    "esm": "tsc --project tsconfig.esm.json"
+    "esm": "tsc --project tsconfig.esm.json",
+    "test": "jest"
   },
   "dependencies": {
     "csstype": "3.1.3"

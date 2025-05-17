@@ -1,6 +1,6 @@
 import { camelToKebabCase, applyCssValue } from './helper.js';
 import type { PropertyType } from '../types/common/css-property.js';
-import type { ClassesStyle, CustomHTMLType, VarsDefinition, CustomProperties } from '../index.js';
+import type { CSSProperties, CSSHTML } from '../index.js';
 
 const createKeyframes = (property: string, content: PropertyType) => {
   let keyframesRules = `${property} {\n`;
@@ -25,7 +25,7 @@ const createKeyframes = (property: string, content: PropertyType) => {
   return keyframesRules;
 };
 
-export function transpiler(object: ClassesStyle | CustomHTMLType | VarsDefinition, base36Hash?: string, core?: string) {
+export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) {
   let styleSheet = '';
   const mediaQueries: { media: string; css: string }[] = [];
 
@@ -40,7 +40,7 @@ export function transpiler(object: ClassesStyle | CustomHTMLType | VarsDefinitio
     return `${indent}${cssProp}: ${value};\n`;
   };
 
-  const stringConverter = (className: string, properties: PropertyType | CustomProperties, indentLevel = 0): PropertyType => {
+  const stringConverter = (className: string, properties: PropertyType | CSSProperties, indentLevel = 0): PropertyType => {
     const classSelector: PropertyType = {};
     const indent = ''.repeat(indentLevel);
     const innerIndent = ' '.repeat(indentLevel + 1);
@@ -115,7 +115,7 @@ export function transpiler(object: ClassesStyle | CustomHTMLType | VarsDefinitio
       const keyframesContent = (object as PropertyType)[property];
       styleSheet += createKeyframes(property, keyframesContent as PropertyType);
     }
-    const classSelectors = stringConverter(classNameType(property), (object as PropertyType)[property] as unknown as CustomProperties, 1);
+    const classSelectors = stringConverter(classNameType(property), (object as PropertyType)[property] as unknown as CSSProperties, 1);
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';

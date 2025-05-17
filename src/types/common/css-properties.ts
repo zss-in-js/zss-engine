@@ -38,12 +38,12 @@ type ExcludeMozInitial<T> = Exclude<T, '-moz-initial'>;
 
 type CSSTypeProperties = Properties<number | (string & {})>;
 
-type CSSProperties = {
+type CustomProperties = {
   [K in keyof CSSTypeProperties]: ExcludeMozInitial<CSSTypeProperties[K]>;
 };
 
 type BaseCSSProperties = {
-  [K in keyof CSSProperties]: CSSProperties[K] | CSSVariableValue;
+  [K in keyof CustomProperties]: CustomProperties[K] | CSSVariableValue;
 };
 
 interface CommonProperties extends BaseCSSProperties {
@@ -81,4 +81,4 @@ type MediaQueryType = {
   [K in MediaQuery]: CommonProperties | ColonType | AndStringType;
 };
 
-export type CustomProperties = CommonProperties | ColonType | CSSVariableProperty | AndStringType | MediaQueryType;
+export type CSSProperties = CommonProperties | ColonType | CSSVariableProperty | AndStringType | MediaQueryType;
