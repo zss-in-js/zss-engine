@@ -13,6 +13,10 @@ export const applyCssValue = (value: string | number, cssProp: string): string =
   return value;
 };
 
-export const camelToKebabCase = (property: string) => {
-  return property.replace(/([A-Z])/g, '-$1').toLowerCase();
-};
+export const camelToKebabCase = (property: string): string =>
+  property
+    // Hyphen at uppercase letter → number boundary
+    .replace(/([A-Z])([0-9])/g, '$1-$2')
+    // Hyphen at the boundary between lowercase letters or numbers and uppercase letters
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase();
