@@ -2,6 +2,7 @@ export type { CSSProperties } from './types/common/css-properties';
 export type { CreateStyleType, ReturnType, CreateStyle } from './types/main/create';
 export type { CSSHTML, CreateKeyframes } from './types/main/global';
 export type { CreateValues, CreateTheme } from './types/main/vars';
+export type { Join } from './types/main/join';
 export { isServer, isDevelopment, isDevAndTest } from './utils/helper.js';
 export { genBase36Hash } from './utils/hash.js';
 export { transpiler } from './utils/transpiler.js';
