@@ -8,4 +8,4 @@ export type CreateStyle = {
   [key: string]: CSSProperties;
 };
 
-export type ReturnType<T> = { [key in keyof T]: string };
+export type ReturnType<T> = { [K in keyof T]: Readonly<T[K]> };
