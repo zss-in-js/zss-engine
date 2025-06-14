@@ -67,18 +67,18 @@ interface CommonProperties extends BaseCSSProperties {
 }
 
 type AndString = `&${string}`;
-type AndStringType = {
+type AndSelector = {
   [key in AndString]: CommonProperties;
 };
 
-type Colon = `:${string}`;
-type ColonType = {
-  [key in Colon]: CommonProperties;
+type ColonString = `:${string}`;
+type ColonSelector = {
+  [key in ColonString]: CommonProperties;
 };
 
 export type MediaQuery = `@media ${string}`;
-type MediaQueryType = {
-  [K in MediaQuery]: CommonProperties | ColonType | AndStringType;
+type MediaQuerySelector = {
+  [K in MediaQuery]: CommonProperties | ColonSelector | AndSelector;
 };
 
-export type CSSProperties = CommonProperties | ColonType | CSSVariableProperty | AndStringType | MediaQueryType;
+export type CSSProperties = CommonProperties | AndSelector | ColonSelector | MediaQuerySelector | CSSVariableProperty;
