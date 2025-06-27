@@ -76,9 +76,9 @@ type ColonSelector = {
   [key in ColonString]: CommonProperties;
 };
 
-export type MediaQuery = `@media ${string}`;
-type MediaQuerySelector = {
-  [K in MediaQuery]: CommonProperties | ColonSelector | AndSelector;
+export type Query = `@media ${string}` | `@container ${string}`;
+type QuerySelector = {
+  [K in Query]: CommonProperties | ColonSelector | AndSelector;
 };
 
-export type CSSProperties = CommonProperties | AndSelector | ColonSelector | MediaQuerySelector | CSSVariableProperty;
+export type CSSProperties = CommonProperties | AndSelector | ColonSelector | QuerySelector | CSSVariableProperty;
