@@ -1,6 +1,6 @@
 {
   "name": "zss-engine",
-  "version": "0.2.44",
+  "version": "0.2.45",
   "description": "Zero-runtime StyleSheet Engine",
   "keywords": [
     "zero-runtime",
