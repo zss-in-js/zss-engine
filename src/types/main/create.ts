@@ -8,4 +8,12 @@ export type CreateStyle = {
   [key: string]: CSSProperties;
 };
 
-export type ReturnType<T> = { [K in keyof T]: Readonly<T[K]> };
+type Selector<Properties> = {
+  readonly properties: Properties;
+};
+
+export type ReturnType<T> = {
+  [K in keyof T]: Readonly<{
+    [P in keyof T[K]]: P extends `@media ${string}` | `@container ${string}` | `:${string}` | `&${string}` ? Selector<keyof T[K][P]> : Readonly<T[K][P]>;
+  }>;
+};
