@@ -1,17 +1,17 @@
 import { camelToKebabCase, applyCssValue } from './helper.js';
-import type { PropertyType } from '../types/common/css-property.js';
+import type { Properties } from '../types/common/properties.js';
 import type { CSSProperties, CSSHTML } from '../index.js';
 
-const createKeyframes = (property: string, content: PropertyType) => {
+const createKeyframes = (property: string, content: Properties) => {
   let keyframesRules = `${property} {\n`;
   for (const key in content) {
     if (Object.prototype.hasOwnProperty.call(content, key)) {
       const keyframeValue = content[key];
       keyframesRules += `  ${key} {\n`;
-      for (const prop in keyframeValue as PropertyType) {
+      for (const prop in keyframeValue as Properties) {
         if (Object.prototype.hasOwnProperty.call(keyframeValue, prop)) {
           const CSSProp = camelToKebabCase(prop);
-          const value = (keyframeValue as PropertyType)[prop];
+          const value = (keyframeValue as Properties)[prop];
           if (typeof value === 'string' || typeof value === 'number') {
             const applyValue = applyCssValue(value, CSSProp);
             keyframesRules += `    ${CSSProp}: ${applyValue};\n`;
@@ -40,15 +40,15 @@ export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) 
     return `${indent}${cssProp}: ${value};\n`;
   };
 
-  const stringConverter = (className: string, properties: PropertyType | CSSProperties, indentLevel = 0): PropertyType => {
-    const classSelector: PropertyType = {};
+  const stringConverter = (className: string, properties: Properties | CSSProperties, indentLevel = 0): Properties => {
+    const classSelector: Properties = {};
     const indent = ''.repeat(indentLevel);
     const innerIndent = ' '.repeat(indentLevel + 1);
     let cssRule = '';
 
     for (const property in properties) {
       if (Object.prototype.hasOwnProperty.call(properties, property)) {
-        const value = (properties as PropertyType)[property];
+        const value = (properties as Properties)[property];
 
         if (typeof value === 'string' || typeof value === 'number') {
           let CSSProp = camelToKebabCase(property);
@@ -65,7 +65,7 @@ export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) 
           const mediaRule = property;
           let nestedRules = '';
           let regularRules = '';
-          for (const mediaProp in value as PropertyType) {
+          for (const mediaProp in value as Properties) {
             if (Object.prototype.hasOwnProperty.call(value, mediaProp)) {
               const mediaValue = value[mediaProp];
               const isColon = mediaProp.startsWith(':');
@@ -112,10 +112,10 @@ export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) 
 
   for (const property in object) {
     if (property.startsWith('@keyframes')) {
-      const keyframesContent = (object as PropertyType)[property];
-      styleSheet += createKeyframes(property, keyframesContent as PropertyType);
+      const keyframesContent = (object as Properties)[property];
+      styleSheet += createKeyframes(property, keyframesContent as Properties);
     }
-    const classSelectors = stringConverter(classNameType(property), (object as PropertyType)[property] as unknown as CSSProperties, 1);
+    const classSelectors = stringConverter(classNameType(property), (object as Properties)[property] as unknown as CSSProperties, 1);
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';
