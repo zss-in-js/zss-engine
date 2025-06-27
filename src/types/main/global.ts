@@ -1,47 +1,55 @@
-import type { CSSProperties, MediaQuery } from '../common/css-properties';
+import type { CSSProperties, Query } from '../common/css-properties';
 
 type JSXType = keyof HTMLElementTagNameMap | '*' | ':root';
-type HTMLType = {
+type HTMLSelector = {
   [K in JSXType]: CSSProperties;
 };
 
 type ClassName = `.${string}`;
-type ClassNameType = {
+type ClassNameSelector = {
   [K in ClassName]: CSSProperties;
 };
 
 type Attribute = `${string}[${string}]${string}`;
-type AttributeType = {
+type AttributeSelector = {
   [K in Attribute]: CSSProperties;
 };
 
 type Consecutive = `${JSXType} ${string}`;
-type ConsecutiveType = {
+type ConsecutiveSelector = {
   [K in Consecutive]: CSSProperties;
 };
 
 type PseudoClass = `${JSXType}:${string}`;
-type PseudoClassType = {
+type PseudoClassSelector = {
   [K in PseudoClass]: CSSProperties;
 };
 
 type PseudoElement = `::${string}`;
-type PseudoElementType = {
+type PseudoElementSelector = {
   [K in PseudoElement]: CSSProperties;
 };
 
-type KeyframeSelector = 'from' | 'to' | `${number}%`;
+type KeyframesInSelector = 'from' | 'to' | `${number}%`;
 
 export type CreateKeyframes = {
-  [K in KeyframeSelector]?: CSSProperties;
+  [K in KeyframesInSelector]?: CSSProperties;
 };
 
-type KeyframesType = {
+type KeyframesSelector = {
   [K in `@keyframes ${string}`]: CreateKeyframes;
 };
 
-type MediaQueryHTMLType = {
-  [K in MediaQuery]: CSSHTML;
+type QuerySelectorHTML = {
+  [K in Query]: CSSHTML;
 };
 
-export type CSSHTML = HTMLType | ClassNameType | AttributeType | ConsecutiveType | PseudoClassType | PseudoElementType | KeyframesType | MediaQueryHTMLType;
+export type CSSHTML =
+  | HTMLSelector
+  | ClassNameSelector
+  | AttributeSelector
+  | ConsecutiveSelector
+  | PseudoClassSelector
+  | PseudoElementSelector
+  | KeyframesSelector
+  | QuerySelectorHTML;
