@@ -1,5 +1,5 @@
-type PropertyValue = string | number | PropertyType;
+type PropertyValue = string | number | Property;
 
-export type PropertyType = {
+export type Property = {
   [key: string]: PropertyValue;
 };
