@@ -1,4 +1,4 @@
-import { CreateStyle, CreateKeyframes } from '../index.js';
+import { CreateStyle, CreateKeyframes, CSSProperties } from '../index.js';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -25,7 +25,7 @@ function getStartingChar(hash: number): string {
   return chars[hash % chars.length];
 }
 
-export function genBase36Hash(object: CreateStyle | CreateKeyframes, n: number): string {
+export function genBase36Hash(object: CreateStyle | CSSProperties | CreateKeyframes, n: number): string {
   const serialized = JSON.stringify(object);
   const hash = simpleHash(serialized);
   let base36Hash = encodeBase36(hash);
