@@ -25,7 +25,7 @@ const createKeyframes = (property: string, content: Property) => {
   return keyframesRules;
 };
 
-export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) {
+export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
   let styleSheet = '';
   const mediaQueries: { media: string; css: string }[] = [];
 
