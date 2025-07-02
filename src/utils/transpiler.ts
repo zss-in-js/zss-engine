@@ -52,9 +52,6 @@ export function transpiler(object: CSSHTML, base36Hash?: string, core?: string) 
 
         if (typeof value === 'string' || typeof value === 'number') {
           let CSSProp = camelToKebabCase(property);
-          if (property.startsWith('ms')) {
-            CSSProp = `-${CSSProp}`;
-          }
           const applyValue = applyCssValue(value, CSSProp);
           cssRule += `  ${CSSProp}: ${applyValue};\n`;
         } else if (!property.startsWith('@')) {
