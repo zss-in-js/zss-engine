@@ -5,9 +5,10 @@ export type { CreateValues, CreateTheme, ReturnVariableType, RxVariableSet, Retu
 export type { Join } from './types/main/join';
 export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js';
 export { genBase36Hash } from './utils/hash.js';
-export { transpiler } from './utils/transpiler.js';
+export { transpile } from './utils/transpile.js';
+export { transpileAtomic } from './utils/transpile-atomic.js';
 export { build } from './utils/build.js';
-export { camelToKebabCase } from './utils/helper.js';
+export { camelToKebabCase, applyCssValue } from './utils/helper.js';
 export { injectClientCSS } from './utils/inject-client-css.js';
 export { injectClientGlobalCSS } from './utils/inject-client-global-css.js';
 export { injectServerCSS, getServerCSS } from './utils/inject-server-css.js';
