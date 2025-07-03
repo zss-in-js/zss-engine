@@ -1,39 +1,80 @@
-import { CreateStyle, CreateKeyframes, CSSProperties } from '../index.js';
+// MurmurHash3 32-bit implementation
+function murmurhash3_32(str: string, seed: number = 0): number {
+  let h = seed;
+  const len = str.length;
+  const c1 = 0xcc9e2d51;
+  const c2 = 0x1b873593;
+  const r1 = 15;
+  const r2 = 13;
+  const m = 5;
+  const n = 0xe6546b64;
 
-const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let i = 0;
+  while (i < len - 3) {
+    let k =
+      (str.charCodeAt(i) & 0xff) | ((str.charCodeAt(i + 1) & 0xff) << 8) | ((str.charCodeAt(i + 2) & 0xff) << 16) | ((str.charCodeAt(i + 3) & 0xff) << 24);
 
-function simpleHash(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
+    k = Math.imul(k, c1);
+    k = (k << r1) | (k >>> (32 - r1));
+    k = Math.imul(k, c2);
+
+    h ^= k;
+    h = (h << r2) | (h >>> (32 - r2));
+    h = Math.imul(h, m) + n;
+
+    i += 4;
   }
-  return Math.abs(hash);
+
+  let k = 0;
+  switch (len % 4) {
+    case 3:
+      k ^= (str.charCodeAt(i + 2) & 0xff) << 16;
+    case 2:
+      k ^= (str.charCodeAt(i + 1) & 0xff) << 8;
+    case 1:
+      k ^= str.charCodeAt(i) & 0xff;
+      k = Math.imul(k, c1);
+      k = (k << r1) | (k >>> (32 - r1));
+      k = Math.imul(k, c2);
+      h ^= k;
+  }
+
+  h ^= len;
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+
+  return h >>> 0;
 }
 
-function encodeBase36(num: number): string {
-  let result = '';
-  do {
-    result = chars[num % 36] + result;
-    num = Math.floor(num / 36);
-  } while (num > 0);
+// MurmurHash3 + toString36 object hash
+export function genBase36Hash(obj: {}, seed: number, length: number): string {
+  const normalized = JSON.stringify(obj, Object.keys(obj || {}).sort());
+  const hashValue = murmurhash3_32(normalized, seed);
+  const hashStr = hashValue.toString(36);
+  const firstChar = 'abcdefghijklmnopqrstuvwxyz'[hashValue % 26];
+
+  let result = firstChar + hashStr;
+
+  if (result.length > length) {
+    // Truncate if too long
+    result = result.slice(0, length);
+  } else if (result.length < length) {
+    // Padding if too short
+    const paddingNeeded = length - result.length;
+    const paddingChars = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+    // Deterministically generate padding characters using hash values
+    let paddingHash = hashValue;
+    for (let i = 0; i < paddingNeeded; i++) {
+      // Linear congruence method
+      paddingHash = paddingHash * 1103515245 + 12345;
+      const paddingChar = paddingChars[Math.abs(paddingHash) % 36];
+      result += paddingChar;
+    }
+  }
+
   return result;
-}
-
-function getStartingChar(hash: number): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz';
-  return chars[hash % chars.length];
-}
-
-export function genBase36Hash(object: CreateStyle | CSSProperties | CreateKeyframes, n: number): string {
-  const serialized = JSON.stringify(object);
-  const hash = simpleHash(serialized);
-  let base36Hash = encodeBase36(hash);
-  const startingChar = getStartingChar(hash);
-
-  while (base36Hash.length < n - 1) {
-    base36Hash = chars[hash % chars.length] + base36Hash;
-  }
-
-  return startingChar + base36Hash.slice(0, n - 1);
 }
