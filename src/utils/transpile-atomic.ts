@@ -1,4 +1,4 @@
-import { applyCssValue, camelToKebabCase } from './helper';
+import { applyCssValue, camelToKebabCase } from './helper.js';
 
 function transpileAtomic(property: string, value: string | number, hash: string): string {
   if (typeof value === 'string' || typeof value === 'number') {
