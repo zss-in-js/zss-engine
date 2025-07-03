@@ -28,7 +28,7 @@ function processAtomicProps(flatProps: Record<string, unknown>, parentAtRule?: s
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
       const singlePropObj = { [property]: normalizedValue };
 
-      const atomicHash = genBase36Hash(singlePropObj, 6);
+      const atomicHash = genBase36Hash(singlePropObj, 1, 7);
       atomicHashes?.push(atomicHash);
 
       let styleSheet = transpileAtomic(property, value as string | number, atomicHash);
