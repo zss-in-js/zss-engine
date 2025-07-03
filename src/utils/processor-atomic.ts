@@ -19,23 +19,23 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
   });
 }
 
-function processAtomicProps(flatProps: Record<string, unknown>, parentAtRule?: string, atomicHashes?: string[], allStyleSheets?: string[]) {
+function processAtomicProps(flatProps: Record<string, unknown>, atomicHashes: string[], allStyleSheets: string[], parentAtRule?: string) {
   Object.entries(flatProps).forEach(([property, value]) => {
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      processAtomicProps(value as Record<string, unknown>, property);
+      processAtomicProps(value as Record<string, unknown>, atomicHashes, allStyleSheets, property);
     } else {
       const CSSProp = camelToKebabCase(property);
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
       const singlePropObj = { [property]: normalizedValue };
 
       const atomicHash = genBase36Hash(singlePropObj, 1, 7);
-      atomicHashes?.push(atomicHash);
+      atomicHashes.push(atomicHash);
 
       let styleSheet = transpileAtomic(property, value as string | number, atomicHash);
       if (parentAtRule) {
         styleSheet = `${parentAtRule} { ${styleSheet} }`;
       }
-      allStyleSheets?.push(styleSheet);
+      allStyleSheets.push(styleSheet);
     }
   });
 }
