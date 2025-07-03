@@ -19,7 +19,7 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
   });
 }
 
-function processAtomicProps(flatProps: Record<string, unknown>, atomicHashes: string[], allStyleSheets: string[], parentAtRule?: string) {
+function processAtomicProps(flatProps: Record<string, unknown>, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
   Object.entries(flatProps).forEach(([property, value]) => {
     if (property.startsWith('@media') || property.startsWith('@container')) {
       processAtomicProps(value as Record<string, unknown>, atomicHashes, allStyleSheets, property);
@@ -29,13 +29,13 @@ function processAtomicProps(flatProps: Record<string, unknown>, atomicHashes: st
       const singlePropObj = { [property]: normalizedValue };
 
       const atomicHash = genBase36Hash(singlePropObj, 1, 7);
-      atomicHashes.push(atomicHash);
+      atomicHashes.add(atomicHash);
 
       let styleSheet = transpileAtomic(property, value as string | number, atomicHash);
       if (parentAtRule) {
         styleSheet = `${parentAtRule} { ${styleSheet} }`;
       }
-      allStyleSheets.push(styleSheet);
+      allStyleSheets.add(styleSheet);
     }
   });
 }
