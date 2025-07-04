@@ -29,8 +29,8 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
   let styleSheet = '';
   const mediaQueries: { media: string; css: string }[] = [];
 
-  const classNameType = (property: string) => {
-    return core === '--global' ? property : `.${property}_${base36Hash}`;
+  const classNameApply = (property: string) => {
+    return core === '--global' ? property : `.${base36Hash}`;
   };
 
   const rules = (indent: string, rulesValue: unknown, property: unknown) => {
@@ -112,7 +112,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
       const keyframesContent = (object as Property)[property];
       styleSheet += createKeyframes(property, keyframesContent as Property);
     }
-    const classSelectors = stringConverter(classNameType(property), (object as Property)[property] as unknown as CSSProperties, 1);
+    const classSelectors = stringConverter(classNameApply(property), (object as Property)[property] as unknown as CSSProperties, 1);
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';
