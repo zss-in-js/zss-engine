@@ -1,3 +1,16 @@
+function deepNormalize(obj: any): string {
+  if (obj === null || obj === undefined) return 'null';
+  if (typeof obj !== 'object') return String(obj);
+
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(deepNormalize).join(',') + ']';
+  }
+
+  const keys = Object.keys(obj).sort();
+  const pairs = keys.map(key => `"${key}":${deepNormalize(obj[key])}`);
+  return '{' + pairs.join(',') + '}';
+}
+
 // MurmurHash3 32-bit implementation
 function murmurhash3_32(str: string, seed: number = 0): number {
   let h = seed;
@@ -51,7 +64,7 @@ function murmurhash3_32(str: string, seed: number = 0): number {
 
 // MurmurHash3 + toString36 object hash
 export function genBase36Hash(obj: {}, seed: number, length: number): string {
-  const normalized = JSON.stringify(obj, Object.keys(obj || {}).sort());
+  const normalized = deepNormalize(obj);
   const hashValue = murmurhash3_32(normalized, seed);
   const hashStr = hashValue.toString(36);
   const firstChar = 'abcdefghijklmnopqrstuvwxyz'[hashValue % 26];
