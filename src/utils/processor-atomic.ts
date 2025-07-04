@@ -19,10 +19,10 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
   });
 }
 
-function processAtomicProps(flatProps: Record<string, unknown>, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
+function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
   Object.entries(flatProps).forEach(([property, value]) => {
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      processAtomicProps(value as Record<string, unknown>, atomicHashes, allStyleSheets, property);
+      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, property);
     } else {
       const CSSProp = camelToKebabCase(property);
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
