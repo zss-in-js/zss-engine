@@ -28,14 +28,14 @@ function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, a
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
       const singlePropObj = { [property]: normalizedValue };
 
-      const atomicHash = genBase36Hash(singlePropObj, 1, 7);
+      const atomicHash = genBase36Hash(singlePropObj, 1, 8);
       atomicHashes.add(atomicHash);
 
       let styleSheet = transpileAtomic(property, value as string | number, atomicHash);
       if (parentAtRule) {
         styleSheet = `${parentAtRule} { ${styleSheet} }`;
       }
-      allStyleSheets.add(styleSheet);
+      allStyleSheets.add(styleSheet + '\n');
     }
   });
 }

@@ -7,10 +7,10 @@ function transpileAtomic(property: string, value: string | number, hash: string)
     const atomicRule = `.${hash} { ${CSSProp}: ${applyValue}; }`;
 
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      return `${property} {\n  ${atomicRule}\n}\n`;
+      return `${property} { ${atomicRule} }`;
     }
 
-    return `${atomicRule}\n`;
+    return atomicRule;
   }
   return '';
 }
