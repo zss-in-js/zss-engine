@@ -9,7 +9,7 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
       const innerFlat: CreateStyle = {};
       const innerNonFlat: CreateStyle = {};
       splitAtomicAndNested(value as Record<string, unknown>, innerFlat, innerNonFlat);
-      if (Object.keys(innerFlat).length) flat[property] = innerFlat;
+      if (Object.keys(innerFlat).length) nonFlat[property] = innerFlat;
       if (Object.keys(innerNonFlat).length) nonFlat[property] = innerNonFlat;
     } else if (typeof value === 'object' && value !== null) {
       flat[property] = value;
