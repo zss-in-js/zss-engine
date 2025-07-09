@@ -9,7 +9,7 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
       const innerFlat: CreateStyle = {};
       const innerNonFlat: CreateStyle = {};
       splitAtomicAndNested(value as Record<string, unknown>, innerFlat, innerNonFlat);
-      if (Object.keys(innerFlat).length) nonFlat[property] = innerFlat;
+      if (Object.keys(innerFlat).length) flat[property] = innerFlat;
       if (Object.keys(innerNonFlat).length) nonFlat[property] = innerNonFlat;
     } else if (typeof value === 'object' && value !== null) {
       flat[property] = value;
@@ -27,8 +27,10 @@ function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, a
       const CSSProp = camelToKebabCase(property);
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
       const singlePropObj = { [property]: normalizedValue };
+      const hashInput = parentAtRule ? { [parentAtRule]: singlePropObj } : singlePropObj;
+      const atomicHash = genBase36Hash(hashInput, 1, 8);
 
-      const atomicHash = genBase36Hash(singlePropObj, 1, 8);
+      if (atomicHashes.has(atomicHash)) return;
       atomicHashes.add(atomicHash);
 
       let styleSheet = transpileAtomic(property, value as string | number, atomicHash);
