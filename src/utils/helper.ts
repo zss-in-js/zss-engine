@@ -4,7 +4,37 @@ export const isServer = !isWindowDefined || !isDocumentDefined;
 export const isDevelopment = process.env.NODE_ENV === 'development';
 export const isTestingDevelopment = process.env.NODE_ENV === 'test' || isDevelopment;
 
-const exception = ['line-height', 'font-weight', 'opacity', 'scale', 'z-index', 'column-count', 'order', 'orphans', 'widows'];
+const exception = [
+  'animation-iteration-count',
+  'column-count',
+  'columns',
+  'fill-opacity',
+  'flex',
+  'flex-grow',
+  'flex-shrink',
+  'flood-opacity',
+  'font-size-adjust',
+  'font-weight',
+  'grid-column',
+  'grid-column-end',
+  'grid-column-start',
+  'grid-row',
+  'grid-row-end',
+  'grid-row-start',
+  'initial-letter',
+  'line-height',
+  'opacity',
+  'order',
+  'orphans',
+  'scale',
+  'shape-image-threshold',
+  'stop-opacity',
+  'stroke-opacity',
+  'tab-size',
+  'widows',
+  'z-index',
+  'zoom',
+];
 
 export const applyCssValue = (value: string | number, cssProp: string): string => {
   if (typeof value === 'number') {
