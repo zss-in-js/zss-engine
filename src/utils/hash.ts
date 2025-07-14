@@ -11,6 +11,12 @@ function deepNormalize(obj: any): string {
   return '{' + pairs.join(',') + '}';
 }
 
+/**
+ * This code includes a modified implementation of MurmurHash3,
+ * based on the original public domain source by Austin Appleby.
+ * Original repository: http://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+ */
+
 // MurmurHash3 32-bit implementation
 function murmurhash3_32(str: string, seed: number = 0): number {
   let h = seed;
