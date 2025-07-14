@@ -27,8 +27,8 @@ function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, a
       const CSSProp = camelToKebabCase(property);
       const normalizedValue = applyCssValue(value as string | number, CSSProp);
       const singlePropObj = { [property]: normalizedValue };
-      const hashInput = parentAtRule ? { [parentAtRule]: singlePropObj } : singlePropObj;
-      const atomicHash = genBase36Hash(hashInput, 1, 8);
+      const styleObj = parentAtRule ? { [parentAtRule]: singlePropObj } : singlePropObj;
+      const atomicHash = genBase36Hash(styleObj, 1, 8);
 
       if (atomicHashes.has(atomicHash)) return;
       atomicHashes.add(atomicHash);
