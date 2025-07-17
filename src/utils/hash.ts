@@ -1,13 +1,15 @@
-function deepNormalize(obj: any): string {
-  if (obj === null || obj === undefined) return 'null';
+function deepNormalize(obj: unknown): string {
+  if (obj === null) return 'null';
+  if (obj === undefined) return 'undefined';
   if (typeof obj !== 'object') return String(obj);
 
   if (Array.isArray(obj)) {
     return '[' + obj.map(deepNormalize).join(',') + ']';
   }
 
-  const keys = Object.keys(obj).sort();
-  const pairs = keys.map(key => `"${key}":${deepNormalize(obj[key])}`);
+  const recordObj = obj as Record<string, unknown>;
+  const keys = Object.keys(recordObj).sort();
+  const pairs = keys.map(key => `"${key}":${deepNormalize(recordObj[key])}`);
   return '{' + pairs.join(',') + '}';
 }
 
