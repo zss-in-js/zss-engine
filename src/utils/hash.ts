@@ -75,7 +75,7 @@ export function genBase36Hash(obj: {}, seed: number, length: number): string {
   const normalized = deepNormalize(obj);
   const hashValue = murmurhash3_32(normalized, seed);
   const hashStr = hashValue.toString(36);
-  const firstChar = 'abcdefghijklmnopqrstuvwxyz'[hashValue % 26];
+  const firstChar = 'z';
 
   let result = firstChar + hashStr;
 
