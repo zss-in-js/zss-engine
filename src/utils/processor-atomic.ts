@@ -1,6 +1,6 @@
 import type { CSSProperties, CreateStyle } from '../index.js';
 import { camelToKebabCase, genBase36Hash, applyCssValue, transpileAtomic } from '../index.js';
-import { SHORTHAND_PROPERTIES } from './shorthand';
+import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: CreateStyle) {
   Object.entries(obj).forEach(([property, value]) => {
