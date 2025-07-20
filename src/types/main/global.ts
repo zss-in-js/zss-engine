@@ -5,6 +5,11 @@ type HTMLSelector = {
   [K in JSXType]: CSSProperties;
 };
 
+type ClassName = `.${string}`;
+type ClassNameSelector = {
+  [K in ClassName]: CSSProperties;
+};
+
 type Attribute = `${string}[${string}]${string}`;
 type AttributeSelector = {
   [K in Attribute]: CSSProperties;
@@ -41,6 +46,7 @@ type QuerySelectorHTML = {
 
 export type CSSHTML =
   | HTMLSelector
+  | ClassNameSelector
   | AttributeSelector
   | ConsecutiveSelector
   | PseudoClassSelector
