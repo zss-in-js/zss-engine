@@ -4,7 +4,7 @@ import { isServer } from './helper.js';
 export const build = async (styleSheet: string, filePath: string, global?: string) => {
   if (!isServer) return;
   const fs = await import('fs');
-  const message = global === '--global' ? `💫 style.global(...):\n\n` : `💫 style.props(...):\n\n`;
+  const message = global === '--global' ? `💫 css.global(...):\n\n` : `💫 css.props(...):\n\n`;
   try {
     if (fs.existsSync(filePath)) {
       const cssData = fs.readFileSync(filePath, 'utf-8');
