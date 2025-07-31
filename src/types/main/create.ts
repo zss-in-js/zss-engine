@@ -8,18 +8,12 @@ export type CreateStyle = {
   [key: string]: CSSProperties;
 };
 
-type SelectorProperties<Properties> = {
+type Selector<Properties> = {
   readonly properties: Properties;
-};
-
-type StyleAtomClassFor<P extends string, V> = {
-  readonly property: `${P}: ${V & (string | number)}`;
 };
 
 export type ReturnType<T> = {
   [K in keyof T]: Readonly<{
-    [P in keyof T[K]]: P extends `@media ${string}` | `@container ${string}` | `:${string}` | `&${string}`
-      ? SelectorProperties<keyof T[K][P]>
-      : StyleAtomClassFor<P & string, T[K][P]>;
+    [P in keyof T[K]]: P extends `@media ${string}` | `@container ${string}` | `:${string}` | `&${string}` ? Selector<keyof T[K][P]> : T[K][P];
   }>;
 };
