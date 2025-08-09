@@ -5,6 +5,6 @@
     "moduleResolution": "Bundler",
     "outDir": "./dist/esm",
     "declaration": true,
-    "declarationDir": "./types"
+    "declarationDir": "./dist/types"
   }
 }
