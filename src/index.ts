@@ -12,4 +12,3 @@ export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
 export { injectClientCSS } from './utils/inject-client-css.js';
 export { injectClientGlobalCSS } from './utils/inject-client-global-css.js';
-export { injectServerCSS, getServerCSS } from './utils/inject-server-css.js';
