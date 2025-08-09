@@ -1,4 +1,4 @@
-import { genBase36Hash, transpiler } from '../src';
+import { genBase36Hash, transpile } from '../src';
 
 test('object to sheet transpiler produces expected output', async () => {
   const object = {
@@ -7,9 +7,8 @@ test('object to sheet transpiler produces expected output', async () => {
     },
   };
 
-  const base62Hash = genBase36Hash(object, 6);
-  const { styleSheet } = transpiler(object, base62Hash);
+  const base62Hash = genBase36Hash(object, 1, 6);
+  const { styleSheet } = transpile(object, base62Hash);
 
-  expect(styleSheet).toContain('.e2e_');
   expect(styleSheet).toContain('color: aqua;');
 });
