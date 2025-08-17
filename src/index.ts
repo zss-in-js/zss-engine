@@ -11,4 +11,4 @@ export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
 export { injectClientCSS } from './utils/inject-client-css.js';
 export { injectClientGlobalCSS } from './utils/inject-client-global-css.js';
-export { hasWebpackPlugin } from './utils/has-webpack-plugin';
+export { isHashInStyleSheets } from './utils/is-hash-in-style-sheets.js';
