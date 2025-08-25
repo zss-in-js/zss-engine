@@ -1,3 +1,8 @@
+/*
+  Atomics with client injection have limitations and require a dedicated plugin implementation.
+  This injection works easily for non-atomic class-based scoping.
+*/
+
 import { isServer } from '../index.js';
 
 const styleSheets: Record<string, HTMLStyleElement> = {};
