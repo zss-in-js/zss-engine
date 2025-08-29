@@ -1,60 +1,52 @@
-/*
-  Atomics with client injection have limitations and require a dedicated plugin implementation.
-  This injection works easily for non-atomic class-based scoping.
-*/
-
 import { isServer } from '../index.js';
 
-const styleSheets: Record<string, HTMLStyleElement> = {};
-const hashCache: Record<string, string> = {};
+const styleCache: Record<string, string> = {};
 
-export function createStyleElement(hash: string): HTMLStyleElement | null {
-  if (document.getElementById(hash)) return null;
+let clientStyleElement: HTMLElement | null = null;
+let queryStyleElement: HTMLElement | null = null;
 
-  const styleElement = document.createElement('style');
-  styleElement.setAttribute('id', hash);
-  styleElement.setAttribute('type', 'text/css');
-  styleSheets[hash] = styleElement;
-  document.head.appendChild(styleElement);
+function createClientStyleElement() {
+  if (!clientStyleElement) {
+    clientStyleElement = document.querySelector('style[data-scope="client"]');
+    if (!clientStyleElement) {
+      clientStyleElement = document.createElement('style');
+      clientStyleElement.setAttribute('data-scope', 'client');
+      clientStyleElement.setAttribute('type', 'text/css');
+      document.head.prepend(clientStyleElement);
+    }
+  }
+  return clientStyleElement;
+}
 
-  return styleSheets[hash];
+function createQueryStyleElement() {
+  if (!queryStyleElement) {
+    queryStyleElement = document.querySelector('style[data-scope="query"]');
+    if (!queryStyleElement) {
+      queryStyleElement = document.createElement('style');
+      queryStyleElement.setAttribute('data-scope', 'query');
+      queryStyleElement.setAttribute('type', 'text/css');
+      document.head.appendChild(queryStyleElement);
+    }
+  }
+  return queryStyleElement;
 }
 
 export function injectClientCSS(hash: string, sheet: string) {
   if (isServer) return;
-  requestAnimationFrame(() => {
-    styleCleanUp();
-  });
-  hashCache[hash] = hash;
-
-  const styleElement = createStyleElement(hash);
-  if (styleElement == null) return;
-
-  styleElement.textContent = sheet;
+  if (styleCache[hash]) return;
+  styleCache[hash] = sheet;
+  const clientElement = createClientStyleElement();
+  // Stacking up for atomic classes
+  clientElement.textContent = sheet + (clientElement.textContent || '');
 }
 
-function styleCleanUp() {
-  requestAnimationFrame(() => {
-    for (const hash in hashCache) {
-      const classElements = document.querySelectorAll(`[class*="${hash}"]`);
-      if (classElements.length === 0) {
-        removeStyleElement(hashCache[hash]);
-      }
-    }
-  });
-}
-
-function removeStyleElement(hash: string) {
-  if (styleSheets[hash]) {
-    delete styleSheets[hash];
-
-    if (hashCache.hasOwnProperty.call(hashCache, hash)) {
-      delete hashCache[hash];
-    }
-
-    const styleElement = document.getElementById(hash);
-    if (styleElement) {
-      document.head.removeChild(styleElement);
-    }
+export function injectClientQuery(hash: string, sheet: string) {
+  if (isServer) return;
+  if (styleCache[hash]) return;
+  styleCache[hash] = sheet;
+  if (sheet.includes('@media') || sheet.includes('@container')) {
+    const queryElement = createQueryStyleElement();
+    // Stacking down for media and container queries
+    queryElement.textContent = (queryElement.textContent || '') + sheet;
   }
 }
