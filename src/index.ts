@@ -1,7 +1,7 @@
 export type { CSSProperties } from './types/common/css-properties';
 export type { CreateStyleType, ReturnType, CreateStyle } from './types/main/create';
 export type { CSSHTML, CreateKeyframes } from './types/main/global';
-export type { CreateValues, CreateTheme, ReturnVariableType, RxVariableSet, ReturnRx } from './types/main/vars';
+export type { CreateValues, CreateTokens, ReturnVariableType, RxVariableSet, ReturnRx } from './types/main/vars';
 export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js';
 export { genBase36Hash } from './utils/hash.js';
 export { transpile } from './utils/transpile.js';
