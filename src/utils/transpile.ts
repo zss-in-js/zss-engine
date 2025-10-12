@@ -33,14 +33,13 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
     return core === '--global' ? property : `.${base36Hash}`;
   };
 
-  const rules = (indent: string, rulesValue: unknown, property: unknown) => {
-    if (typeof property !== 'string') return '';
+  const rules = (indent: string, rulesValue: unknown, property: string) => {
     const value = (rulesValue as Record<string, unknown>)[property];
     const cssProp = camelToKebabCase(property);
     return `${indent}${cssProp}: ${value};\n`;
   };
 
-  const stringConverter = (className: string, properties: Property | CSSProperties, indentLevel = 0): Property => {
+  const stringConverter = (className: string, properties: Property | CSSProperties, indentLevel: number): Property => {
     const classSelector: Property = {};
     const indent = ''.repeat(indentLevel);
     const innerIndent = ' '.repeat(indentLevel + 1);
