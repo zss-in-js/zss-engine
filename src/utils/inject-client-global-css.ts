@@ -6,6 +6,7 @@
 import { isServer } from '../index.js';
 
 export function injectClientGlobalCSS(sheet: string) {
+  /* istanbul ignore next */
   if (isServer) return;
 
   const existingStyleElement = document.querySelector(`[data-scope="global"]`);

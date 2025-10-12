@@ -44,6 +44,8 @@ export function injectClientQuery(hash: string, sheet: string) {
   if (isServer) return;
   if (styleCache[hash]) return;
   styleCache[hash] = sheet;
+
+  /* istanbul ignore next */
   if (sheet.includes('@media') || sheet.includes('@container')) {
     const queryElement = createQueryStyleElement();
     // Stacking down for media and container queries

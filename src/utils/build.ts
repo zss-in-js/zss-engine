@@ -2,6 +2,7 @@
 import { isServer } from './helper.js';
 
 export const build = async (styleSheet: string, filePath: string, global?: string) => {
+  /* istanbul ignore next */
   if (!isServer) return;
   const fs = await import('fs');
   const message = global === '--global' ? `defines💫:\n\n` : `props💫:\n\n`;

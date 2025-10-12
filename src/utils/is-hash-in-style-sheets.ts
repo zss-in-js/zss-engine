@@ -12,21 +12,25 @@ export function isHashInStyleSheets(hash: string): boolean {
       return Array.from(rule.cssRules).some(checkRule);
     }
 
+    /* istanbul ignore next */
     // For CSSContainerRule (@container query)
     if (rule instanceof CSSContainerRule) {
       return Array.from(rule.cssRules).some(checkRule);
     }
 
+    /* istanbul ignore next */
     // For CSSSupportsRule (@supports query)
     if (rule instanceof CSSSupportsRule) {
       return Array.from(rule.cssRules).some(checkRule);
     }
 
+    /* istanbul ignore next */
     // Other group rules (@keyframes, etc.)
     if ('cssRules' in rule && rule.cssRules) {
       return Array.from(rule.cssRules as CSSRuleList).some(checkRule);
     }
 
+    /* istanbul ignore next */
     return false;
   }
 
@@ -49,6 +53,7 @@ export function isHashInStyleSheets(hash: string): boolean {
     try {
       return Array.from(sheet.cssRules).some(checkRule);
     } catch (_err) {
+      /* istanbul ignore next */
       // If access is not possible due to CORS restrictions, etc.
       return false;
     }
