@@ -12,8 +12,6 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: Cr
       splitAtomicAndNested(value as Record<string, unknown>, innerFlat, innerNonFlat);
       if (Object.keys(innerFlat).length) flat[property] = innerFlat;
       if (Object.keys(innerNonFlat).length) nonFlat[property] = innerNonFlat;
-    } else if (typeof value === 'object' && value !== null) {
-      flat[property] = value;
     } else {
       flat[property] = value;
     }
@@ -27,13 +25,18 @@ Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
   });
 });
 
-function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
-  const seen = new Set<string>();
-  const resultQueue: Array<[string, string | number]> = [];
-
+function processAtomicProps(
+  flatProps: CSSProperties,
+  atomicHashes: Set<string>,
+  allStyleSheets: Set<string>,
+  seen: Set<string>,
+  resultQueue: Array<[string, string | number]>,
+  parentAtRule?: string
+) {
   for (const [property, value] of Object.entries(flatProps)) {
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, property);
+      const nestedQueue: Array<[string, string | number]> = [];
+      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, seen, nestedQueue, property);
       continue;
     }
 
@@ -41,14 +44,10 @@ function processAtomicProps(flatProps: CreateStyle, atomicHashes: Set<string>, a
 
     if (SHORTHAND_PROPERTIES[kebab]) {
       const longhands = SHORTHAND_PROPERTIES[kebab];
-      longhands.forEach(l => seen.delete(l));
+      longhands.forEach(longhand => seen.delete(longhand));
       seen.add(kebab);
       resultQueue.push([property, value as string | number]);
     } else if (kebab in LONG_TO_SHORT) {
-      const shorthand = LONG_TO_SHORT[kebab];
-      if (seen.has(shorthand)) {
-        continue;
-      }
       seen.add(kebab);
       resultQueue.push([property, value as string | number]);
     } else {
