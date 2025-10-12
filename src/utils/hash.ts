@@ -20,7 +20,7 @@ function deepNormalize(obj: unknown): string {
  */
 
 // MurmurHash3 32-bit implementation
-function murmurhash3_32(str: string, seed: number = 0): number {
+function murmurhash3_32(str: string, seed: number): number {
   let h = seed;
   const len = str.length;
   const c1 = 0xcc9e2d51;
