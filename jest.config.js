@@ -8,6 +8,6 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  coverageReporters: ['text', 'html'],
+  coverageReporters: ['text', 'lcov', 'html'],
   reporters: [['github-actions', { silent: false }], 'summary'],
 };
