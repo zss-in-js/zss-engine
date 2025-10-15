@@ -25,35 +25,15 @@ Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
   });
 });
 
-function processAtomicProps(
-  flatProps: CSSProperties,
-  atomicHashes: Set<string>,
-  allStyleSheets: Set<string>,
-  seen: Set<string>,
-  resultQueue: Array<[string, string | number]>,
-  parentAtRule?: string
-) {
+function processAtomicProps(flatProps: CSSProperties, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
+  const resultQueue: Array<[string, string | number]> = [];
   for (const [property, value] of Object.entries(flatProps)) {
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      const nestedQueue: Array<[string, string | number]> = [];
-      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, seen, nestedQueue, property);
+      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, property);
       continue;
     }
 
-    const kebab = camelToKebabCase(property);
-
-    if (SHORTHAND_PROPERTIES[kebab]) {
-      const longhands = SHORTHAND_PROPERTIES[kebab];
-      longhands.forEach(longhand => seen.delete(longhand));
-      seen.add(kebab);
-      resultQueue.push([property, value as string | number]);
-    } else if (kebab in LONG_TO_SHORT) {
-      seen.add(kebab);
-      resultQueue.push([property, value as string | number]);
-    } else {
-      seen.add(kebab);
-      resultQueue.push([property, value as string | number]);
-    }
+    resultQueue.push([property, value as string | number]);
   }
 
   for (const [property, value] of resultQueue) {
