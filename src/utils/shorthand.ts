@@ -77,3 +77,13 @@ export const SHORTHAND_PROPERTIES: Record<string, string[]> = {
   'text-emphasis': ['text-emphasis-style', 'text-emphasis-color'],
   mask: ['mask-image', 'mask-mode', 'mask-position', 'mask-size', 'mask-repeat', 'mask-origin', 'mask-clip', 'mask-composite'],
 };
+
+export const LONG_TO_SHORT: Record<string, string[]> = {};
+Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
+  longhands.forEach(longhand => {
+    if (!LONG_TO_SHORT[longhand]) {
+      LONG_TO_SHORT[longhand] = [];
+    }
+    LONG_TO_SHORT[longhand].push(shorthand);
+  });
+});
