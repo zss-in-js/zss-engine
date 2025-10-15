@@ -10,13 +10,13 @@ describe('transpileAtomic', () => {
   test('transpiles simple property with number value', () => {
     const result = transpileAtomic('fontSize', 16, 'def456');
 
-    expect(result).toBe('.def456 { font-size: 16px; }');
+    expect(result).toBe('.def456:not(#\\#) { font-size: 16px; }');
   });
 
   test('transpiles property with camelCase conversion', () => {
     const result = transpileAtomic('backgroundColor', 'blue', 'ghi789');
 
-    expect(result).toBe('.ghi789 { background-color: blue; }');
+    expect(result).toBe('.ghi789:not(#\\#) { background-color: blue; }');
   });
 
   test('transpiles @media query', () => {
