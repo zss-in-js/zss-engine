@@ -118,8 +118,6 @@ describe('splitAtomicAndNested', () => {
 describe('processAtomicProps', () => {
   let atomicHashes: Set<string>;
   let allStyleSheets: Set<string>;
-  const seen = new Set<string>();
-  const resultQueue: Array<[string, string | number]> = [];
 
   beforeEach(() => {
     atomicHashes = new Set();
@@ -130,7 +128,7 @@ describe('processAtomicProps', () => {
     const flatProps = {
       color: 'red',
     };
-    processAtomicProps(flatProps, atomicHashes, allStyleSheets, seen, resultQueue);
+    processAtomicProps(flatProps, atomicHashes, allStyleSheets);
 
     expect(allStyleSheets.size).toBe(1);
     expect(atomicHashes.size).toBe(1);
@@ -142,10 +140,10 @@ describe('processAtomicProps', () => {
         color: 'blue',
       },
     };
-    processAtomicProps(flatProps, atomicHashes, allStyleSheets, seen, resultQueue);
+    processAtomicProps(flatProps, atomicHashes, allStyleSheets);
 
-    expect(allStyleSheets.size).toBe(2);
-    expect(atomicHashes.size).toBe(2);
+    expect(allStyleSheets.size).toBe(1);
+    expect(atomicHashes.size).toBe(1);
   });
 
   test('handles shorthand properties', () => {
@@ -155,20 +153,18 @@ describe('processAtomicProps', () => {
         marginTop: '20px',
       },
       atomicHashes,
-      allStyleSheets,
-      seen,
-      resultQueue
+      allStyleSheets
     );
-    expect(atomicHashes.size).toBe(3);
+    expect(atomicHashes.size).toBe(2);
     expect(allStyleSheets).not.toContain('margin-top:20px');
   });
 
   test('ignores longhand when shorthand is present', () => {
-    processAtomicProps({ margin: '10px' }, atomicHashes, allStyleSheets, seen, resultQueue);
-    processAtomicProps({ marginTop: '5px' }, atomicHashes, allStyleSheets, seen, resultQueue);
+    processAtomicProps({ margin: '10px' }, atomicHashes, allStyleSheets);
+    processAtomicProps({ marginTop: '5px' }, atomicHashes, allStyleSheets);
 
-    expect(allStyleSheets.size).toBe(4);
-    expect(atomicHashes.size).toBe(4);
+    expect(allStyleSheets.size).toBe(2);
+    expect(atomicHashes.size).toBe(2);
   });
 
   test('processes multiple atomic properties', () => {
@@ -177,13 +173,11 @@ describe('processAtomicProps', () => {
         color: 'green',
       },
       atomicHashes,
-      allStyleSheets,
-      seen,
-      resultQueue
+      allStyleSheets
     );
 
-    expect(allStyleSheets.size).toBe(5);
-    expect(atomicHashes.size).toBe(5);
+    expect(allStyleSheets.size).toBe(1);
+    expect(atomicHashes.size).toBe(1);
   });
 
   test('skips duplicate atomic hashes', () => {
@@ -191,13 +185,13 @@ describe('processAtomicProps', () => {
       color: 'red',
     };
 
-    processAtomicProps(flat, atomicHashes, allStyleSheets, seen, resultQueue);
+    processAtomicProps(flat, atomicHashes, allStyleSheets);
     const firstSize = allStyleSheets.size;
 
-    processAtomicProps(flat, atomicHashes, allStyleSheets, seen, resultQueue);
+    processAtomicProps(flat, atomicHashes, allStyleSheets);
     const secondSize = allStyleSheets.size;
 
     expect(firstSize).toBe(secondSize);
-    expect(firstSize).toBe(5);
+    expect(firstSize).toBe(1);
   });
 });
