@@ -8,7 +8,7 @@ export { genBase36Hash } from './utils/hash.js';
 export { transpile } from './utils/transpile.js';
 export { transpileAtomic } from './utils/transpile-atomic.js';
 export { splitAtomicAndNested, processAtomicProps } from './utils/processor-atomic.js';
-export { SHORTHAND_PROPERTIES } from './utils/shorthand.js';
+export { SHORTHAND_PROPERTIES, LONG_TO_SHORT } from './utils/shorthand.js';
 export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
 export { injectClientCSS, injectClientQuery } from './utils/inject-client-css.js';
