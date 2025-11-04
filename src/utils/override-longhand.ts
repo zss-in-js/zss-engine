@@ -1,4 +1,6 @@
-import { camelToKebabCase, CreateStyle, LONG_TO_SHORT, SHORTHAND_PROPERTIES } from '..';
+import type { CreateStyle } from '../types/main/create.js';
+import { camelToKebabCase } from './helper.js';
+import { LONG_TO_SHORT, SHORTHAND_PROPERTIES } from './shorthand.js';
 
 export const overrideLonghand = (style: CreateStyle) => {
   const props = Object.keys(style);
