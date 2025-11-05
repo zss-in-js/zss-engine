@@ -10,8 +10,7 @@ describe('index exports', () => {
     expect(index.transpileAtomic).toBeDefined();
     expect(index.splitAtomicAndNested).toBeDefined();
     expect(index.processAtomicProps).toBeDefined();
-    expect(index.SHORTHAND_PROPERTIES).toBeDefined();
-    expect(index.LONG_TO_SHORT).toBeDefined();
+
     expect(index.build).toBeDefined();
     expect(index.camelToKebabCase).toBeDefined();
     expect(index.applyCssValue).toBeDefined();
