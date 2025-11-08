@@ -4,11 +4,12 @@ describe('transformNestedSelectors', () => {
   it('should add :not(##) to selectors starting with : or &', () => {
     const input = {
       ':hover': { color: 'red' },
-      '&.active': { color: 'blue' },
+      '&:hover': { color: 'blue' },
     };
+    // "&" is removed by the transpile function
     const expected = {
-      ':hover:not(#\\#)': { color: 'red' },
-      '&.active:not(#\\#)': { color: 'blue' },
+      ':not(#\\#):hover': { color: 'red' },
+      ':not(#\\#)&:hover': { color: 'blue' },
     };
     expect(transformNestedSelectors(input)).toEqual(expected);
   });
