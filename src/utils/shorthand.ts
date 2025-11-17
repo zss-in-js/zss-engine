@@ -1,4 +1,4 @@
-// reference https://github.com/ota-meshi/eslint-plugin-css/blob/main/lib/utils/resource/index.ts
+// reference [https://github.com/ota-meshi/eslint-plugin-css/blob/main/lib/utils/resource/index.ts]
 
 export const SHORTHAND_PROPERTIES: Record<string, string[]> = {
   margin: ['margin-top', 'margin-bottom', 'margin-left', 'margin-right'],
