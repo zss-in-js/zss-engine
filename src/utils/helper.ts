@@ -1,3 +1,5 @@
+import { hexToColorName } from './hex-to-color-name.js';
+
 const isWindowDefined = typeof window !== 'undefined';
 const isDocumentDefined = typeof document !== 'undefined';
 export const isServer = !isWindowDefined || !isDocumentDefined;
@@ -41,11 +43,17 @@ const exception = [
   'zoom',
 ];
 
+const convertHexToColorName = (value: string): string => {
+  return value.replace(/#[0-9a-fA-F]{3,6}\b/g, match => {
+    return hexToColorName[match.toLowerCase()] || match;
+  });
+};
+
 export const applyCssValue = (value: string | number, cssProp: string): string => {
   if (typeof value === 'number') {
     return exception.includes(cssProp) ? value.toString() : value + 'px';
   }
-  return value;
+  return convertHexToColorName(value);
 };
 
 export const camelToKebabCase = (property: string) => {
