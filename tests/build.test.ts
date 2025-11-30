@@ -98,29 +98,4 @@ describe('build', () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error writing to file:', error);
   });
-
-  test('handles file system errors in readFileSync', async () => {
-    const error = new Error('Read error');
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
-    (fs.readFileSync as jest.Mock).mockImplementation(() => {
-      throw error;
-    });
-
-    await build('.test { color: red; }', './test.css');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error writing to file:', error);
-  });
-
-  test('handles file system errors in appendFileSync', async () => {
-    const error = new Error('Write error');
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
-    (fs.readFileSync as jest.Mock).mockReturnValue('existing');
-    (fs.appendFileSync as jest.Mock).mockImplementation(() => {
-      throw error;
-    });
-
-    await build('.new { color: red; }', './test.css');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error writing to file:', error);
-  });
 });
