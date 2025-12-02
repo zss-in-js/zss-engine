@@ -78,7 +78,7 @@ type ColonSelector = {
 
 export type Query = `@media ${string}` | `@container ${string}`;
 type QuerySelector = {
-  [K in Query]: CommonProperties | ColonSelector | AndSelector;
+  [K in Query]: CommonProperties | ColonSelector | AndSelector | CSSVariableProperty;
 };
 
 export type CSSProperties = CommonProperties | AndSelector | ColonSelector | QuerySelector | CSSVariableProperty;
