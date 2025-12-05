@@ -7,9 +7,9 @@ export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js
 export { genBase36Hash } from './utils/hash.js';
 export { transpile } from './utils/transpile.js';
 export { transpileAtomic } from './utils/transpile-atomic.js';
-export { transformNestedSelectors } from './utils/transform-nested-selectors';
+export { transformNestedSelectors } from './utils/transform-nested-selectors.js';
 export { splitAtomicAndNested, processAtomicProps } from './utils/processor-atomic.js';
-export { overrideLonghand } from './utils/override-longhand';
+export { overrideLonghand } from './utils/override-longhand.js';
 export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
 export { injectClientCSS, injectClientQuery } from './utils/inject-client-css.js';
