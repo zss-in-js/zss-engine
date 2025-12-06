@@ -16,10 +16,6 @@ describe('index exports', () => {
     expect(index.build).toBeDefined();
     expect(index.camelToKebabCase).toBeDefined();
     expect(index.applyCssValue).toBeDefined();
-    expect(index.injectClientCSS).toBeDefined();
-    expect(index.injectClientQuery).toBeDefined();
-    expect(index.injectClientGlobalCSS).toBeDefined();
-    expect(index.isHashInStyleSheets).toBeDefined();
   });
 
   test('exported functions are callable', () => {
@@ -33,10 +29,6 @@ describe('index exports', () => {
     expect(typeof index.build).toBe('function');
     expect(typeof index.camelToKebabCase).toBe('function');
     expect(typeof index.applyCssValue).toBe('function');
-    expect(typeof index.injectClientCSS).toBe('function');
-    expect(typeof index.injectClientQuery).toBe('function');
-    expect(typeof index.injectClientGlobalCSS).toBe('function');
-    expect(typeof index.isHashInStyleSheets).toBe('function');
   });
 
   test('exported constants have correct types', () => {
