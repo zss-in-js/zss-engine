@@ -9,5 +9,5 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   coverageReporters: ['text', 'lcov', 'html'],
-  reporters: [['github-actions', { silent: false }], 'summary'],
+  reporters: [[process.env.CI ? 'github-actions' : 'default', { silent: false }], 'summary'],
 };
