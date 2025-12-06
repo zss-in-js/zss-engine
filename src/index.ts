@@ -12,6 +12,3 @@ export { splitAtomicAndNested, processAtomicProps } from './utils/processor-atom
 export { overrideLonghand } from './utils/override-longhand.js';
 export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
-export { injectClientCSS, injectClientQuery } from './utils/inject-client-css.js';
-export { injectClientGlobalCSS } from './utils/inject-client-global-css.js';
-export { isHashInStyleSheets } from './utils/is-hash-in-style-sheets.js';
