@@ -1,13 +1,12 @@
 export type { CSSProperties } from './types/common/css-properties';
 export type { CreateStyleType, ReturnType, CreateStyle } from './types/main/create';
 export type { CSSHTML, CreateKeyframes } from './types/main/global';
-export type { CreateValues, CreateTokens, ReturnVariableType, RxVariableSet, ReturnRx } from './types/main/variableTypes';
+export type { CreateTheme, CreateValues, ReturnVariableType, XVariableSet, ReturnX } from './types/main/variableTypes';
 export type { ViewTransitionOptions } from './types/main/viewTransitionOptions';
 export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js';
 export { genBase36Hash } from './utils/hash.js';
 export { transpile } from './utils/transpile.js';
 export { transpileAtomic } from './utils/transpile-atomic.js';
-export { transformNestedSelectors } from './utils/transform-nested-selectors.js';
 export { splitAtomicAndNested, processAtomicProps } from './utils/processor-atomic.js';
 export { overrideLonghand } from './utils/override-longhand.js';
 export { build } from './utils/build.js';
