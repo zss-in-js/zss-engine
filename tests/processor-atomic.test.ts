@@ -116,22 +116,19 @@ describe('splitAtomicAndNested', () => {
 });
 
 describe('processAtomicProps', () => {
-  let atomicHashes: Set<string>;
-  let allStyleSheets: Set<string>;
+  let atomicMap: Map<string, string>;
 
   beforeEach(() => {
-    atomicHashes = new Set();
-    allStyleSheets = new Set();
+    atomicMap = new Map();
   });
 
   test('processes basic atomic properties', () => {
     const flatProps = {
       color: 'red',
     };
-    processAtomicProps(flatProps, atomicHashes, allStyleSheets);
+    processAtomicProps(flatProps, atomicMap);
 
-    expect(allStyleSheets.size).toBe(1);
-    expect(atomicHashes.size).toBe(1);
+    expect(atomicMap.size).toBe(1);
   });
 
   test('processes @media queries', () => {
@@ -140,10 +137,9 @@ describe('processAtomicProps', () => {
         color: 'blue',
       },
     };
-    processAtomicProps(flatProps, atomicHashes, allStyleSheets);
+    processAtomicProps(flatProps, atomicMap);
 
-    expect(allStyleSheets.size).toBe(1);
-    expect(atomicHashes.size).toBe(1);
+    expect(atomicMap.size).toBe(1);
   });
 
   test('handles shorthand properties', () => {
@@ -152,19 +148,19 @@ describe('processAtomicProps', () => {
         margin: '10px',
         marginTop: '20px',
       },
-      atomicHashes,
-      allStyleSheets
+      atomicMap
     );
-    expect(atomicHashes.size).toBe(2);
-    expect(allStyleSheets).not.toContain('margin-top:20px');
+    expect(atomicMap.size).toBe(2);
+
+    const sheets = Array.from(atomicMap.values()).join('');
+    expect(sheets).not.toContain('margin-top:20px');
   });
 
   test('ignores longhand when shorthand is present', () => {
-    processAtomicProps({ margin: '10px' }, atomicHashes, allStyleSheets);
-    processAtomicProps({ marginTop: '5px' }, atomicHashes, allStyleSheets);
+    processAtomicProps({ margin: '10px' }, atomicMap);
+    processAtomicProps({ marginTop: '5px' }, atomicMap);
 
-    expect(allStyleSheets.size).toBe(2);
-    expect(atomicHashes.size).toBe(2);
+    expect(atomicMap.size).toBe(2);
   });
 
   test('processes multiple atomic properties', () => {
@@ -172,12 +168,10 @@ describe('processAtomicProps', () => {
       {
         color: 'green',
       },
-      atomicHashes,
-      allStyleSheets
+      atomicMap
     );
 
-    expect(allStyleSheets.size).toBe(1);
-    expect(atomicHashes.size).toBe(1);
+    expect(atomicMap.size).toBe(1);
   });
 
   test('skips duplicate atomic hashes', () => {
@@ -185,11 +179,11 @@ describe('processAtomicProps', () => {
       color: 'red',
     };
 
-    processAtomicProps(flat, atomicHashes, allStyleSheets);
-    const firstSize = allStyleSheets.size;
+    processAtomicProps(flat, atomicMap);
+    const firstSize = atomicMap.size;
 
-    processAtomicProps(flat, atomicHashes, allStyleSheets);
-    const secondSize = allStyleSheets.size;
+    processAtomicProps(flat, atomicMap);
+    const secondSize = atomicMap.size;
 
     expect(firstSize).toBe(secondSize);
     expect(firstSize).toBe(1);
