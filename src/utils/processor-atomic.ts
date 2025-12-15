@@ -25,11 +25,11 @@ Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
   });
 });
 
-function processAtomicProps(flatProps: CSSProperties, atomicHashes: Set<string>, allStyleSheets: Set<string>, parentAtRule?: string) {
+function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, string>, parentAtRule?: string) {
   const resultQueue: Array<[string, string | number]> = [];
   for (const [property, value] of Object.entries(flatProps)) {
     if (property.startsWith('@media') || property.startsWith('@container')) {
-      processAtomicProps(value as CreateStyle, atomicHashes, allStyleSheets, property);
+      processAtomicProps(value as CreateStyle, atomicMap, property);
       continue;
     }
 
@@ -43,14 +43,13 @@ function processAtomicProps(flatProps: CSSProperties, atomicHashes: Set<string>,
     const styleObj = parentAtRule ? { [parentAtRule]: singlePropObj } : singlePropObj;
     const atomicHash = genBase36Hash(styleObj, 1, 8);
 
-    if (atomicHashes.has(atomicHash)) continue;
-    atomicHashes.add(atomicHash);
+    if (atomicMap.has(atomicHash)) continue;
 
     let styleSheet = transpileAtomic(property, value, atomicHash);
     if (parentAtRule) {
       styleSheet = `${parentAtRule} { ${styleSheet} }`;
     }
-    allStyleSheets.add(styleSheet + '\n');
+    atomicMap.set(atomicHash, styleSheet + '\n');
   }
 }
 
