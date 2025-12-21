@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { styleText } from 'util';
 import { build } from '../src/utils/build';
 import fs from 'fs';
 
@@ -60,22 +61,10 @@ describe('build', () => {
     (fs.appendFileSync as jest.Mock).mockImplementation();
 
     const styleSheet = '.global { color: green; }';
-    await build(styleSheet, './test.css', '--global');
-
-    expect(consoleLogSpy).toHaveBeenCalledWith(`defines💫:\n\n${styleSheet}`);
-  });
-
-  test('uses "props💫" message without --global flag', async () => {
-    process.argv.push('--view');
-
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
-    (fs.readFileSync as jest.Mock).mockReturnValue('');
-    (fs.appendFileSync as jest.Mock).mockImplementation();
-
-    const styleSheet = '.props { color: yellow; }';
     await build(styleSheet, './test.css');
 
-    expect(consoleLogSpy).toHaveBeenCalledWith(`props💫:\n\n${styleSheet}`);
+    const line = styleText('gray', '─'.repeat(60));
+    expect(consoleLogSpy).toHaveBeenCalledWith('\n' + styleText(['green', 'bold'], '✓ extract...') + '\n\n' + styleText('cyan', styleSheet) + '\n' + line);
   });
 
   test('does not log when --view flag is not present', async () => {
