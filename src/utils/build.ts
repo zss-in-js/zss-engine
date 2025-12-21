@@ -1,17 +1,20 @@
 'use server';
 import { isServer } from './helper.js';
 
-export const build = async (styleSheet: string, filePath: string, global?: string) => {
+export const build = async (styleSheet: string, filePath: string) => {
   /* istanbul ignore next */
   if (!isServer) return;
   const fs = await import('fs');
-  const message = global === '--global' ? `defines💫:\n\n` : `props💫:\n\n`;
   try {
     if (fs.existsSync(filePath)) {
-      const cssData = fs.readFileSync(filePath, 'utf-8');
-      if (!cssData.includes(styleSheet)) {
+      const css = fs.readFileSync(filePath, 'utf-8');
+      if (!css.includes(styleSheet)) {
         fs.appendFileSync(filePath, styleSheet, 'utf-8');
-        if (process.argv.includes('--view')) console.log(message + styleSheet);
+        if (process.argv.includes('--view')) {
+          const { styleText } = await import('util');
+          const line = styleText('gray', '─'.repeat(60));
+          console.log('\n' + styleText(['green', 'bold'], '✓ extract...') + '\n\n' + styleText('cyan', styleSheet) + '\n' + line);
+        }
       }
     }
     return;
