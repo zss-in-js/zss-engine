@@ -55,7 +55,9 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
           cssRule += `  ${CSSProp}: ${applyValue};\n`;
         } else if (!property.startsWith('@')) {
           const kebabPseudoSelector = camelToKebabCase(property.replace('&', ''));
-          const styles = stringConverter(className + kebabPseudoSelector, value, indentLevel);
+          const isPseudo = property.startsWith(':') || property.startsWith('&');
+          const selector = isPseudo ? className + ':not(#\\#)' + kebabPseudoSelector : className + kebabPseudoSelector;
+          const styles = stringConverter(selector, value, indentLevel);
           Object.assign(classSelector, styles);
         } else if (property.startsWith('@media') || property.startsWith('@container')) {
           const mediaRule = property;
@@ -68,6 +70,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
               const isAnd = mediaProp.startsWith('&');
               if (isColon || isAnd) {
                 const kebabMediaProp = camelToKebabCase(mediaProp.replace('&', ''));
+                const increaseKebabMediaProp = ':not(#\\#)' + kebabMediaProp;
                 let pseudoClassRule = '';
 
                 if (typeof mediaValue === 'object' && mediaValue !== null) {
@@ -79,7 +82,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
                     }
                   }
                 }
-                nestedRules += `${innerIndent}${className}${kebabMediaProp} {\n${pseudoClassRule}${innerIndent}}\n`;
+                nestedRules += `${innerIndent}${className}${increaseKebabMediaProp} {\n${pseudoClassRule}${innerIndent}}\n`;
               } else {
                 const CSSProp = camelToKebabCase(mediaProp);
                 const applyValue = applyCssValue(mediaValue as string | number, CSSProp);
