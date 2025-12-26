@@ -1,3 +1,6 @@
+import { TextEncoder } from 'util';
+const { asUintN } = BigInt;
+
 function deepNormalize(obj: unknown): string {
   if (obj === null) return 'null';
   if (obj === undefined) return 'undefined';
@@ -13,89 +16,136 @@ function deepNormalize(obj: unknown): string {
   return '{' + pairs.join(',') + '}';
 }
 
+// 64-bit unsigned rotate left
+function rotl64(x: bigint, r: number): bigint {
+  const shift = BigInt(r);
+  return asUintN(64, (x << shift) | (x >> (64n - shift)));
+}
+
+// 64-bit finalization mix
+function fmix64(k: bigint): bigint {
+  k ^= k >> 33n;
+  k = asUintN(64, k * 0xff51afd7ed558ccdn);
+  k ^= k >> 33n;
+  k = asUintN(64, k * 0xc4ceb9fe1a85ec53n);
+  k ^= k >> 33n;
+  return k;
+}
+
 /**
- * This code includes a modified implementation of MurmurHash3,
- * based on the original public domain source by Austin Appleby.
- * Original repository: http://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+ * MurmurHash3 x64-128 (x64 variant).
+ * Ported from Austin Appleby's original C++ implementation.
+ * https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
  */
+function murmurhash3_x64_128(str: string, seed: number): bigint {
+  let h1 = asUintN(64, BigInt(seed));
+  let h2 = asUintN(64, BigInt(seed));
 
-// MurmurHash3 32-bit implementation
-function murmurhash3_32(str: string, seed: number): number {
-  let h = seed;
-  const len = str.length;
-  const c1 = 0xcc9e2d51;
-  const c2 = 0x1b873593;
-  const r1 = 15;
-  const r2 = 13;
-  const m = 5;
-  const n = 0xe6546b64;
+  const c1 = 0x87c37b91114253d5n;
+  const c2 = 0x4cf5ad432745937fn;
 
-  let i = 0;
-  while (i < len - 3) {
-    let k =
-      (str.charCodeAt(i) & 0xff) | ((str.charCodeAt(i + 1) & 0xff) << 8) | ((str.charCodeAt(i + 2) & 0xff) << 16) | ((str.charCodeAt(i + 3) & 0xff) << 24);
+  const encoder = new TextEncoder();
+  const key = encoder.encode(str);
+  const len = key.length;
+  const nblocks = Math.floor(len / 16);
+  const view = new DataView(key.buffer, key.byteOffset, key.byteLength);
 
-    k = Math.imul(k, c1);
-    k = (k << r1) | (k >>> (32 - r1));
-    k = Math.imul(k, c2);
+  for (let i = 0; i < nblocks; i++) {
+    const i16 = i * 16;
+    let k1 = view.getBigUint64(i16, true);
+    let k2 = view.getBigUint64(i16 + 8, true);
 
-    h ^= k;
-    h = (h << r2) | (h >>> (32 - r2));
-    h = Math.imul(h, m) + n;
+    k1 = asUintN(64, k1 * c1);
+    k1 = rotl64(k1, 31);
+    k1 = asUintN(64, k1 * c2);
+    h1 ^= k1;
 
-    i += 4;
+    h1 = rotl64(h1, 27);
+    h1 = asUintN(64, h1 + h2);
+    h1 = asUintN(64, h1 * 5n + 0x52dce729n);
+
+    k2 = asUintN(64, k2 * c2);
+    k2 = rotl64(k2, 33);
+    k2 = asUintN(64, k2 * c1);
+    h2 ^= k2;
+
+    h2 = rotl64(h2, 31);
+    h2 = asUintN(64, h2 + h1);
+    h2 = asUintN(64, h2 * 5n + 0x38495ab5n);
   }
 
-  let k = 0;
-  switch (len % 4) {
+  // tail
+  const tailIndex = nblocks * 16;
+  let k1 = 0n;
+  let k2 = 0n;
+
+  switch (len & 15) {
+    case 15:
+      k2 ^= BigInt(key[tailIndex + 14]) << 48n;
+    case 14:
+      k2 ^= BigInt(key[tailIndex + 13]) << 40n;
+    case 13:
+      k2 ^= BigInt(key[tailIndex + 12]) << 32n;
+    case 12:
+      k2 ^= BigInt(key[tailIndex + 11]) << 24n;
+    case 11:
+      k2 ^= BigInt(key[tailIndex + 10]) << 16n;
+    case 10:
+      k2 ^= BigInt(key[tailIndex + 9]) << 8n;
+    case 9:
+      k2 ^= BigInt(key[tailIndex + 8]);
+      k2 = asUintN(64, k2 * c2);
+      k2 = rotl64(k2, 33);
+      k2 = asUintN(64, k2 * c1);
+      h2 ^= k2;
+    // fallthrough
+    case 8:
+      k1 ^= BigInt(key[tailIndex + 7]) << 56n;
+    case 7:
+      k1 ^= BigInt(key[tailIndex + 6]) << 48n;
+    case 6:
+      k1 ^= BigInt(key[tailIndex + 5]) << 40n;
+    case 5:
+      k1 ^= BigInt(key[tailIndex + 4]) << 32n;
+    case 4:
+      k1 ^= BigInt(key[tailIndex + 3]) << 24n;
     case 3:
-      k ^= (str.charCodeAt(i + 2) & 0xff) << 16;
+      k1 ^= BigInt(key[tailIndex + 2]) << 16n;
     case 2:
-      k ^= (str.charCodeAt(i + 1) & 0xff) << 8;
+      k1 ^= BigInt(key[tailIndex + 1]) << 8n;
     case 1:
-      k ^= str.charCodeAt(i) & 0xff;
-      k = Math.imul(k, c1);
-      k = (k << r1) | (k >>> (32 - r1));
-      k = Math.imul(k, c2);
-      h ^= k;
+      k1 ^= BigInt(key[tailIndex + 0]);
+      k1 = asUintN(64, k1 * c1);
+      k1 = rotl64(k1, 31);
+      k1 = asUintN(64, k1 * c2);
+      h1 ^= k1;
   }
 
-  h ^= len;
-  h ^= h >>> 16;
-  h = Math.imul(h, 0x85ebca6b);
-  h ^= h >>> 13;
-  h = Math.imul(h, 0xc2b2ae35);
-  h ^= h >>> 16;
+  // finalization
+  h1 ^= BigInt(len);
+  h2 ^= BigInt(len);
 
-  return h >>> 0;
+  h1 = asUintN(64, h1 + h2);
+  h2 = asUintN(64, h2 + h1);
+
+  h1 = fmix64(h1);
+  h2 = fmix64(h2);
+
+  h1 = asUintN(64, h1 + h2);
+  h2 = asUintN(64, h2 + h1);
+
+  // Combine the two 64-bit hashes into one. XOR is a standard way to do this.
+  return asUintN(64, h1 ^ h2);
 }
 
 // MurmurHash3 + toString36 object hash
 export function genBase36Hash(obj: {}, seed: number, length: number): string {
   const normalized = deepNormalize(obj);
-  const hashValue = murmurhash3_32(normalized, seed);
-  const hashStr = hashValue.toString(36);
-  const firstChar = 'x';
+  const hashValue = murmurhash3_x64_128(normalized, seed);
 
-  let result = firstChar + hashStr;
+  // A 64-bit hash can be up to approx. 13 chars in base36.
+  // This avoids the need for loops or padding for typical lengths.
+  const hash = hashValue.toString(36);
 
-  if (result.length > length) {
-    // Truncate if too long
-    result = result.slice(0, length);
-  } else if (result.length < length) {
-    // Padding if too short
-    const paddingNeeded = length - result.length;
-    const paddingChars = '0123456789abcdefghijklmnopqrstuvwxyz';
-
-    // Deterministically generate padding characters using hash values
-    let paddingHash = hashValue;
-    for (let i = 0; i < paddingNeeded; i++) {
-      // Linear congruence method
-      paddingHash = paddingHash * 1103515245 + 12345;
-      const paddingChar = paddingChars[Math.abs(paddingHash) % 36];
-      result += paddingChar;
-    }
-  }
-
-  return result;
+  return 'x' + hash.slice(-(length - 1));
 }
