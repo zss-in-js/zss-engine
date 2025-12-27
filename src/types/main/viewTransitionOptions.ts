@@ -1,6 +1,6 @@
 import { CSSProperties } from '../common/css-properties';
 
-export type ViewTransitionOptions = {
+export type ViewTransition = {
   group?: CSSProperties;
   imagePair?: CSSProperties;
   new?: CSSProperties;
