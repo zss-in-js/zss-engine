@@ -10,4 +10,5 @@ module.exports = {
   testEnvironment: 'jsdom',
   coverageReporters: ['text', 'lcov', 'html'],
   reporters: [[process.env.CI ? 'github-actions' : 'default', { silent: false }], 'summary'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 };
