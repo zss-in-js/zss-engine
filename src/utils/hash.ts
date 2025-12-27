@@ -1,4 +1,3 @@
-import { TextEncoder } from 'util';
 const { asUintN } = BigInt;
 
 function deepNormalize(obj: unknown): string {
