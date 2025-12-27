@@ -32,12 +32,12 @@ type PseudoElementSelector = {
 
 type KeyframesInSelector = 'from' | 'to' | `${number}%`;
 
-export type CreateKeyframes = {
+export type Keyframes = {
   [K in KeyframesInSelector]?: CSSProperties;
 };
 
 type KeyframesSelector = {
-  [K in `@keyframes ${string}`]: CreateKeyframes;
+  [K in `@keyframes ${string}`]: Keyframes;
 };
 
 type QuerySelectorHTML = {
