@@ -2,7 +2,7 @@ export type { CSSProperties } from './types/common/css-properties';
 export type { CreateStyleType, ReturnType, CreateStyle } from './types/main/create';
 export type { CSSHTML, Keyframes } from './types/main/global';
 export type { CreateStatic, CreateTheme, ReturnVariableType, Styles } from './types/main/variableTypes';
-export type { ViewTransition } from './types/main/viewTransitionOptions';
+export type { ViewTransition } from './types/main/viewTransition';
 export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js';
 export { genBase36Hash } from './utils/hash.js';
 export { transpile } from './utils/transpile.js';
