@@ -3,7 +3,7 @@ import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 const ALL_LONGHANDS = new Set(Object.values(SHORTHAND_PROPERTIES).flat());
 
-function transpileAtomic(property: string, value: string | number, hash: string): string {
+function transpileAtomic(property: string, value: string | number, hash: string, pseudo?: string): string {
   if (typeof value === 'string' || typeof value === 'number') {
     const CSSProp = camelToKebabCase(property);
     const applyValue = applyCssValue(value, CSSProp);
@@ -11,6 +11,10 @@ function transpileAtomic(property: string, value: string | number, hash: string)
     let selector = `.${hash}`;
     if (ALL_LONGHANDS.has(CSSProp)) {
       selector += ':not(#\\#)';
+    }
+
+    if (pseudo) {
+      selector += pseudo;
     }
 
     const atomicRule = `${selector} { ${CSSProp}: ${applyValue}; }`;
