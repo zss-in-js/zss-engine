@@ -1,6 +1,11 @@
 import { transpileAtomic } from '../src';
 
 describe('transpileAtomic', () => {
+  test('generates correct CSS with pseudo selector', () => {
+    const result = transpileAtomic('color', 'red', 'x123abc', ':hover');
+    expect(result).toBe('.x123abc:hover { color: red; }');
+  });
+
   test('transpiles simple property with string value', () => {
     const result = transpileAtomic('color', 'red', 'abc123');
 
