@@ -66,9 +66,9 @@ interface CommonProperties extends BaseCSSProperties {
   columnRuleColor?: CSSColorProperty;
 }
 
-type AndString = `&${string}`;
-type AndSelector = {
-  [key in AndString]: CommonProperties;
+type ArrayString = `[${string}`;
+type ArraySelector = {
+  [key in ArrayString]: CommonProperties;
 };
 
 type ColonString = `:${string}`;
@@ -78,7 +78,7 @@ type ColonSelector = {
 
 export type Query = `@media ${string}` | `@container ${string}`;
 type QuerySelector = {
-  [K in Query]: CommonProperties | ColonSelector | AndSelector | CSSVariableProperty;
+  [K in Query]: CommonProperties | ColonSelector | ArraySelector | CSSVariableProperty;
 };
 
-export type CSSProperties = CommonProperties | AndSelector | ColonSelector | QuerySelector | CSSVariableProperty;
+export type CSSProperties = CommonProperties | ArraySelector | ColonSelector | QuerySelector | CSSVariableProperty;
