@@ -51,7 +51,7 @@ const convertHexToColorName = (value: string): string => {
 
 export const applyCssValue = (value: string | number, cssProp: string): string => {
   if (typeof value === 'number') {
-    return exception.includes(cssProp) ? value.toString() : value + 'px';
+    return exception.includes(cssProp) || cssProp.startsWith('--') ? value.toString() : value + 'px';
   }
   return convertHexToColorName(value);
 };
