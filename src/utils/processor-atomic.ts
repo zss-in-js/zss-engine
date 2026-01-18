@@ -4,7 +4,7 @@ import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: CreateStyle) {
   Object.entries(obj).forEach(([property, value]) => {
-    if (property.startsWith(':') || property.startsWith('&')) {
+    if (property.startsWith(':') || property.startsWith('[')) {
       nonFlat[property] = value;
     } else if (property.startsWith('@media') || property.startsWith('@container')) {
       const innerFlat: CreateStyle = {};
