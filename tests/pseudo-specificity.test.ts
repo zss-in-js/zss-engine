@@ -8,7 +8,7 @@ describe('transpile specificity enhancement', () => {
         ':hover': {
           color: 'red',
         },
-        '&::before': {
+        '::before': {
           content: '""',
           display: 'block',
         },
