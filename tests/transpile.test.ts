@@ -10,7 +10,7 @@ test('transpile handles edge cases in media queries', () => {
         [':first-child']: {
           marginLeft: 0,
         },
-        '&:last-child': {
+        ':last-child': {
           marginRight: 0,
         },
       },
@@ -33,7 +33,7 @@ test('transpile handles container queries with nested selectors', () => {
       containerType: 'inline-size',
       '@container (min-width: 500px)': {
         padding: '30px',
-        '&:empty': {
+        ':empty': {
           display: 'none',
         },
       },
@@ -76,10 +76,10 @@ test('transpile handles pseudo-selectors', () => {
   const object = {
     button: {
       color: 'blue',
-      '&:hover': {
+      ':hover': {
         color: 'red',
       },
-      '&::before': {
+      '::before': {
         content: '""',
       },
     },
@@ -124,7 +124,7 @@ test('transpile handles @media with pseudo-selectors', () => {
           color: 'red',
           textDecoration: 'underline',
         },
-        '&:focus': {
+        ':focus': {
           outline: '2px solid blue',
         },
       },
