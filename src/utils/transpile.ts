@@ -54,8 +54,8 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
           const applyValue = applyCssValue(value, CSSProp);
           cssRule += `  ${CSSProp}: ${applyValue};\n`;
         } else if (!property.startsWith('@')) {
-          const kebabPseudoSelector = camelToKebabCase(property.replace('&', ''));
-          const isPseudo = property.startsWith(':') || property.startsWith('&');
+          const kebabPseudoSelector = camelToKebabCase(property);
+          const isPseudo = property.startsWith(':') || property.startsWith('[');
           const selector = isPseudo ? className + ':not(#\\#)' + kebabPseudoSelector : className + kebabPseudoSelector;
           const styles = stringConverter(selector, value, indentLevel);
           Object.assign(classSelector, styles);
@@ -67,9 +67,9 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
             if (Object.prototype.hasOwnProperty.call(value, mediaProp)) {
               const mediaValue = value[mediaProp];
               const isColon = mediaProp.startsWith(':');
-              const isAnd = mediaProp.startsWith('&');
-              if (isColon || isAnd) {
-                const kebabMediaProp = camelToKebabCase(mediaProp.replace('&', ''));
+              const isArray = mediaProp.startsWith('[');
+              if (isColon || isArray) {
+                const kebabMediaProp = camelToKebabCase(mediaProp);
                 const increaseKebabMediaProp = ':not(#\\#)' + kebabMediaProp;
                 let pseudoClassRule = '';
 
