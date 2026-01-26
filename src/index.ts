@@ -9,5 +9,4 @@ export { transpile } from './utils/transpile.js';
 export { transpileAtomic } from './utils/transpile-atomic.js';
 export { splitAtomicAndNested, processAtomicProps } from './utils/processor-atomic.js';
 export { overrideLonghand } from './utils/override-longhand.js';
-export { build } from './utils/build.js';
 export { camelToKebabCase, applyCssValue } from './utils/helper.js';
