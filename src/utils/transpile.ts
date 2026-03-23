@@ -42,7 +42,6 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
 
   const stringConverter = (className: string, properties: Property | CSSProperties, indentLevel: number): Property => {
     const classSelector: Property = {};
-    const indent = ''.repeat(indentLevel);
     const innerIndent = ' '.repeat(indentLevel + 1);
     let cssRule = '';
 
@@ -94,12 +93,12 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
           if (regularRules) {
             mediaQueries.push({
               media: mediaRule,
-              css: `${mediaRule} {\n${innerIndent}${className} {\n${regularRules}  }\n${nestedRules}${indent}}${indent}\n`,
+              css: `${mediaRule} {\n${innerIndent}${className} {\n${regularRules}  }\n${nestedRules}}\n`,
             });
           } else {
             mediaQueries.push({
               media: mediaRule,
-              css: `${mediaRule} {\n${nestedRules}${indent}}\n`,
+              css: `${mediaRule} {\n${nestedRules}}\n`,
             });
           }
         }
