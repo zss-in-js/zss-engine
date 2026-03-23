@@ -1,7 +1,7 @@
 {
   "name": "zss-engine",
-  "version": "2.2.4",
-  "description": "Zero-runtime StyleSheet Engine",
+  "version": "2.2.5",
+  "description": "A CSS-in-JS transpiler engine for building zero-runtime stylesheets at build time.",
   "funding": "https://github.com/sponsors/refirst11",
   "author": "Refirst 11",
   "license": "MIT",
@@ -13,11 +13,18 @@
     "url": "https://github.com/zss-in-js/zss-engine/issues"
   },
   "keywords": [
-    "zero-runtime",
     "stylesheet",
+    "transpiler",
     "atomic",
+    "atomic-css",
+    "semantic",
+    "wyw-in-js",
     "engine",
-    "css-in-js"
+    "zero-runtime",
+    "css-in-js",
+    "hash",
+    "codegen",
+    "compiler"
   ],
   "sideEffects": false,
   "exports": {
