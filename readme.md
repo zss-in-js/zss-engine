@@ -1,6 +1,10 @@
 [![codecov](https://codecov.io/github/zss-in-js/zss-engine/graph/badge.svg?token=4TGC0PMCAL)](https://codecov.io/github/zss-in-js/zss-engine)
 
-> Zero-runtime StyleSheet Engine
+# zss-engine
+
+A CSS-in-JS transpiler engine for building zero-runtime stylesheets at build time.
+
+> Powers the build pipeline of [@plumeria/core](https://github.com/zss-in-js/plumeria)
 
 ## License
 
