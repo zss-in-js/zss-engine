@@ -1,6 +1,6 @@
 {
   "name": "zss-engine",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "A CSS-in-JS transpiler engine for building zero-runtime stylesheets at build time.",
   "funding": "https://github.com/sponsors/refirst11",
   "author": "Refirst 11",
