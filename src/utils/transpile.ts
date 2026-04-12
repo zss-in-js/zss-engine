@@ -1,6 +1,5 @@
 import { camelToKebabCase, applyCssValue } from './helper.js';
 import type { Property } from '../types/common/css-property.js';
-import type { CSSProperties } from '../index.js';
 import type { CSSHTML } from '../types/main/global.js';
 
 const createKeyframes = (property: string, content: Property) => {
@@ -40,7 +39,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
     return `${indent}${cssProp}: ${value};\n`;
   };
 
-  const stringConverter = (className: string, properties: Property | CSSProperties, indentLevel: number): Property => {
+  const stringConverter = (className: string, properties: Property, indentLevel: number): Property => {
     const classSelector: Property = {};
     const innerIndent = ' '.repeat(indentLevel + 1);
     let cssRule = '';
@@ -114,7 +113,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
       const keyframesContent = (object as Property)[property];
       styleSheet += createKeyframes(property, keyframesContent as Property);
     }
-    const classSelectors = stringConverter(classNameApply(property), (object as Property)[property] as unknown as CSSProperties, 1);
+    const classSelectors = stringConverter(classNameApply(property), (object as Property)[property] as unknown as Property, 1);
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';
