@@ -1,4 +1,4 @@
-import { transpileAtomic } from '../src';
+import { transpileAtomic } from '../src/index';
 
 describe('transpileAtomic', () => {
   test('generates correct CSS with pseudo selector', () => {
