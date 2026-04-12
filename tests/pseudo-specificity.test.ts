@@ -1,4 +1,4 @@
-import { genBase36Hash, transpile } from '../src';
+import { genBase36Hash, transpile } from '../src/index';
 
 describe('transpile specificity enhancement', () => {
   it('should add :not(##) to pseudo-elements for increased specificity', () => {
