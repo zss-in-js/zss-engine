@@ -1,8 +1,8 @@
-import type { CreateStyle } from '../types/main/create.js';
+import { CSSProperties } from '../types/common/css-properties.js';
 import { camelToKebabCase } from './helper.js';
 import { LONG_TO_SHORT, SHORTHAND_PROPERTIES } from './shorthand.js';
 
-export const overrideLonghand = (style: CreateStyle) => {
+export const overrideLonghand = (style: CSSProperties) => {
   const props = Object.keys(style);
   const propsToRemove = new Set<string>();
 
@@ -38,17 +38,18 @@ export const overrideLonghand = (style: CreateStyle) => {
     }
   }
 
-  const finalStyle: CreateStyle = {};
+  const finalStyle: Record<string, unknown> = {};
+  const queryStyle = style as Record<string, unknown>;
   for (const prop of props) {
     if (propsToRemove.has(prop)) {
       continue;
     }
     if (prop.startsWith('@')) {
-      finalStyle[prop] = overrideLonghand(style[prop] as CreateStyle);
+      finalStyle[prop] = overrideLonghand(queryStyle[prop] as CSSProperties);
     } else {
-      finalStyle[prop] = style[prop];
+      finalStyle[prop] = queryStyle[prop];
     }
   }
 
-  return finalStyle;
+  return finalStyle as CSSProperties;
 };
