@@ -1,5 +1,4 @@
 export type { CSSProperties } from './types/common/css-properties';
-export type { CreateStyle } from './types/main/create';
 export type { CreateTheme } from './types/main/variableTypes';
 export type { ViewTransition } from './types/main/viewTransition';
 export { isServer, isDevelopment, isTestingDevelopment } from './utils/helper.js';
