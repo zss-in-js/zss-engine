@@ -1,12 +1,11 @@
 import { overrideLonghand } from '../src/utils/override-longhand';
-import { CreateStyle } from '../src/types/main/create';
 
 describe('overrideLonghand', () => {
   test('should remove longhand properties overridden by shorthand properties', () => {
     const style = {
       marginTop: '10px',
       margin: '20px',
-    } as CreateStyle;
+    };
     const expected = {
       margin: '20px',
     };
@@ -17,7 +16,7 @@ describe('overrideLonghand', () => {
     const style = {
       margin: '20px',
       marginTop: '10px',
-    } as CreateStyle;
+    };
     const expected = {
       margin: '20px',
       marginTop: '10px',
@@ -32,7 +31,7 @@ describe('overrideLonghand', () => {
       marginBottom: '15px',
       marginRight: '5px',
       margin: '20px',
-    } as CreateStyle;
+    };
     const expected = {
       margin: '20px',
     };
@@ -48,7 +47,7 @@ describe('overrideLonghand', () => {
         margin: '5px',
       },
       paddingLeft: '5px',
-    } as CreateStyle;
+    };
     const expected = {
       color: 'red',
       '@media (min-width: 768px)': {
@@ -68,7 +67,7 @@ describe('overrideLonghand', () => {
         padding: '20px',
       },
       paddingLeft: '5px',
-    } as CreateStyle;
+    };
     const expected = {
       padding: '30px',
       '@media (min-width: 768px)': {
