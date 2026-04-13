@@ -3,6 +3,8 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "nodenext",
-    "outDir": "./dist/cjs"
-  }
+    "outDir": "./dist/cjs",
+    "rootDir": "src"
+  },
+  "include": ["src"]
 }
