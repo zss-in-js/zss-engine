@@ -1,19 +1,21 @@
-import type { CSSProperties, CreateStyle } from '../index.js';
+import type { CSSProperties } from '../index.js';
 import { camelToKebabCase, genBase36Hash, applyCssValue, transpileAtomic } from '../index.js';
 import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
-function splitAtomicAndNested(obj: CSSProperties, flat: CreateStyle, nonFlat: CreateStyle) {
+function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: CSSProperties) {
+  const queryFlat = flat as Record<string, unknown>;
+  const queryNonFlat = nonFlat as Record<string, unknown>;
   Object.entries(obj).forEach(([property, value]) => {
     if (property.startsWith(':') || property.startsWith('[')) {
-      nonFlat[property] = value;
+      queryNonFlat[property] = value;
     } else if (property.startsWith('@media') || property.startsWith('@container')) {
-      const innerFlat: CreateStyle = {};
-      const innerNonFlat: CreateStyle = {};
-      splitAtomicAndNested(value as Record<string, unknown>, innerFlat, innerNonFlat);
-      if (Object.keys(innerFlat).length) flat[property] = innerFlat;
-      if (Object.keys(innerNonFlat).length) nonFlat[property] = innerNonFlat;
+      const innerFlat: CSSProperties = {};
+      const innerNonFlat: CSSProperties = {};
+      splitAtomicAndNested(value as CSSProperties, innerFlat, innerNonFlat);
+      if (Object.keys(innerFlat).length) queryFlat[property] = innerFlat;
+      if (Object.keys(innerNonFlat).length) queryNonFlat[property] = innerNonFlat;
     } else {
-      flat[property] = value;
+      queryFlat[property] = value;
     }
   });
 }
@@ -27,13 +29,13 @@ Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
 
 function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, string>, parentAtRule?: string) {
   const resultQueue: Array<[string, string | number]> = [];
-  for (const [property, value] of Object.entries(flatProps)) {
-    if (property.startsWith('@media') || property.startsWith('@container')) {
-      processAtomicProps(value as CreateStyle, atomicMap, property);
+  for (const [key, style] of Object.entries(flatProps)) {
+    if (key.startsWith('@media') || key.startsWith('@container')) {
+      processAtomicProps(style as CSSProperties, atomicMap, key);
       continue;
     }
 
-    resultQueue.push([property, value as string | number]);
+    resultQueue.push([key, style as string | number]);
   }
 
   for (const [property, value] of resultQueue) {
