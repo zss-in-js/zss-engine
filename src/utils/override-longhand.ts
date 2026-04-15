@@ -1,4 +1,4 @@
-import { CSSProperties } from '../types/common/css-properties.js';
+import { CSSProperties } from '../types/css-properties.js';
 import { camelToKebabCase } from './helper.js';
 import { LONG_TO_SHORT, SHORTHAND_PROPERTIES } from './shorthand.js';
 
