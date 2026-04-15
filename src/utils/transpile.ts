@@ -1,6 +1,6 @@
 import { camelToKebabCase, applyCssValue } from './helper.js';
-import type { Property } from '../types/common/css-property.js';
-import type { CSSHTML } from '../types/main/global.js';
+import type { Property } from '../types/css-property.js';
+import type { CSSProperties } from '../types/css-properties.js';
 
 const createKeyframes = (property: string, content: Property) => {
   let keyframesRules = `${property} {\n`;
@@ -25,7 +25,7 @@ const createKeyframes = (property: string, content: Property) => {
   return keyframesRules;
 };
 
-export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
+export function transpile(object: Record<string, CSSProperties>, base36Hash?: string, core?: string) {
   let styleSheet = '';
   const mediaQueries: { media: string; css: string }[] = [];
 
@@ -46,7 +46,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
 
     for (const property in properties) {
       if (Object.prototype.hasOwnProperty.call(properties, property)) {
-        const value = (properties as Property)[property];
+        const value = properties[property];
 
         if (typeof value === 'string' || typeof value === 'number') {
           let CSSProp = camelToKebabCase(property);
@@ -62,7 +62,7 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
           const mediaRule = property;
           let nestedRules = '';
           let regularRules = '';
-          for (const mediaProp in value as Property) {
+          for (const mediaProp in value) {
             if (Object.prototype.hasOwnProperty.call(value, mediaProp)) {
               const mediaValue = value[mediaProp];
               const isColon = mediaProp.startsWith(':');
@@ -110,10 +110,10 @@ export function transpile(object: CSSHTML, base36Hash?: string, core?: string) {
 
   for (const property in object) {
     if (property.startsWith('@keyframes')) {
-      const keyframesContent = (object as Property)[property];
-      styleSheet += createKeyframes(property, keyframesContent as Property);
+      const keyframesContent = object[property];
+      styleSheet += createKeyframes(property, keyframesContent);
     }
-    const classSelectors = stringConverter(classNameApply(property), (object as Property)[property] as unknown as Property, 1);
+    const classSelectors = stringConverter(classNameApply(property), object[property], 1);
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';
