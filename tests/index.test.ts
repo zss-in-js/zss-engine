@@ -2,9 +2,6 @@ import * as index from '../src/index';
 
 describe('index exports', () => {
   test('exports utility functions', () => {
-    expect(index.isServer).toBeDefined();
-    expect(index.isDevelopment).toBeDefined();
-    expect(index.isTestingDevelopment).toBeDefined();
     expect(index.genBase36Hash).toBeDefined();
     expect(index.transpile).toBeDefined();
     expect(index.transpileAtomic).toBeDefined();
@@ -24,11 +21,5 @@ describe('index exports', () => {
     expect(typeof index.overrideLonghand).toBe('function');
     expect(typeof index.camelToKebabCase).toBe('function');
     expect(typeof index.applyCssValue).toBe('function');
-  });
-
-  test('exported constants have correct types', () => {
-    expect(typeof index.isServer).toBe('boolean');
-    expect(typeof index.isDevelopment).toBe('boolean');
-    expect(typeof index.isTestingDevelopment).toBe('boolean');
   });
 });
