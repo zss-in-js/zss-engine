@@ -1,12 +1,5 @@
 import { hexToColorName } from './hex-to-color-name.js';
 
-const isWindowDefined = typeof window !== 'undefined';
-const isDocumentDefined = typeof document !== 'undefined';
-export const isServer = !isWindowDefined || !isDocumentDefined;
-export const isDevelopment = process.env.NODE_ENV === 'development';
-/* istanbul ignore next */
-export const isTestingDevelopment = process.env.NODE_ENV === 'test' || isDevelopment;
-
 const exception = [
   'animation-iteration-count',
   'aspect-ratio',
