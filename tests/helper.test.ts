@@ -1,4 +1,4 @@
-import { applyCssValue, camelToKebabCase } from '../src/utils/helper';
+import { applyCssValue, camelToKebabCase, isAtRule } from '../src/utils/helper';
 
 describe('camelToKebabCase', () => {
   test('converts camelCase to kebab-case', () => {
@@ -41,5 +41,23 @@ describe('applyCssValue', () => {
 
   test('handles undefined color names for hex codes', () => {
     expect(applyCssValue('#123456', 'color')).toBe('#123456');
+  });
+});
+
+describe('isAtRule', () => {
+  test('returns true for query-like at-rules', () => {
+    expect(isAtRule('@media (min-width: 768px)')).toBe(true);
+    expect(isAtRule('@container (min-width: 300px)')).toBe(true);
+    expect(isAtRule('@supports (display: grid)')).toBe(true);
+    expect(isAtRule('@layer utilities')).toBe(true);
+    expect(isAtRule('@scope (.card)')).toBe(true);
+  });
+
+  test('returns false for other properties or at-rules', () => {
+    expect(isAtRule('color')).toBe(false);
+    expect(isAtRule('fontSize')).toBe(false);
+    expect(isAtRule('@font-face')).toBe(false);
+    expect(isAtRule('@keyframes slide-in')).toBe(false);
+    expect(isAtRule('@property --foo')).toBe(false);
   });
 });
