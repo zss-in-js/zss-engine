@@ -1,4 +1,4 @@
-import { camelToKebabCase, applyCssValue } from './helper.js';
+import { camelToKebabCase, applyCssValue, isAtRule } from './helper.js';
 import type { Property } from '../types/css-property.js';
 import type { CSSProperties } from '../types/css-properties.js';
 
@@ -58,7 +58,7 @@ export function transpile(object: Record<string, CSSProperties>, base36Hash?: st
           const selector = isPseudo ? className + ':not(#\\#)' + kebabPseudoSelector : className + kebabPseudoSelector;
           const styles = stringConverter(selector, value, indentLevel);
           Object.assign(classSelector, styles);
-        } else if (property.startsWith('@media') || property.startsWith('@container')) {
+        } else if (isAtRule(property)) {
           const mediaRule = property;
           let nestedRules = '';
           let regularRules = '';
