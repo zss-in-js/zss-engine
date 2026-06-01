@@ -1,5 +1,7 @@
 import type { CSSProperties } from '../index.js';
-import { camelToKebabCase, genBase36Hash, applyCssValue, transpileAtomic } from '../index.js';
+import { camelToKebabCase, applyCssValue, isAtRule } from './helper.js';
+import { transpileAtomic } from './transpile-atomic.js';
+import { genBase36Hash } from './hash.js';
 import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: CSSProperties) {
@@ -8,7 +10,7 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: 
   Object.entries(obj).forEach(([property, value]) => {
     if (property.startsWith(':') || property.startsWith('[')) {
       queryNonFlat[property] = value;
-    } else if (property.startsWith('@media') || property.startsWith('@container')) {
+    } else if (isAtRule(property)) {
       const innerFlat: CSSProperties = {};
       const innerNonFlat: CSSProperties = {};
       splitAtomicAndNested(value as CSSProperties, innerFlat, innerNonFlat);
@@ -30,7 +32,7 @@ Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
 function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, string>, parentAtRule?: string) {
   const resultQueue: Array<[string, string | number]> = [];
   for (const [key, style] of Object.entries(flatProps)) {
-    if (key.startsWith('@media') || key.startsWith('@container')) {
+    if (isAtRule(key)) {
       processAtomicProps(style as CSSProperties, atomicMap, key);
       continue;
     }
