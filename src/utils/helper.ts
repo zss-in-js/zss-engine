@@ -68,3 +68,14 @@ export const camelToKebabCase = (property: string) => {
       .toLowerCase()
   );
 };
+
+export const isAtRule = (prop: string) => {
+  return (
+    prop.startsWith('@media') ||
+    prop.startsWith('@container') ||
+    prop.startsWith('@supports') ||
+    prop.startsWith('@layer') ||
+    prop.startsWith('@scope')
+  );
+};
+
