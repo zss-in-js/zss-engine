@@ -1,4 +1,4 @@
-import { applyCssValue, camelToKebabCase } from './helper.js';
+import { applyCssValue, camelToKebabCase, isAtRule } from './helper.js';
 import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 const ALL_LONGHANDS = new Set(Object.values(SHORTHAND_PROPERTIES).flat());
@@ -19,7 +19,7 @@ function transpileAtomic(property: string, value: string | number, hash: string,
 
     const atomicRule = `${selector} { ${CSSProp}: ${applyValue}; }`;
 
-    if (property.startsWith('@media') || property.startsWith('@container')) {
+    if (isAtRule(property)) {
       return `${property} { ${atomicRule} }`;
     }
 
