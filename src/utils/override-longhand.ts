@@ -1,4 +1,4 @@
-import { CSSProperties } from '../types/css-properties.js';
+import type { CSSProperties } from '../types/css-properties.js';
 import { camelToKebabCase } from './helper.js';
 import { LONG_TO_SHORT, SHORTHAND_PROPERTIES } from './shorthand.js';
 
@@ -6,7 +6,7 @@ export const overrideLonghand = (style: CSSProperties) => {
   const props = Object.keys(style);
   const propsToRemove = new Set<string>();
 
-  // Find plain props and their indices
+  // Find plain props and their indices 
   const plainProps: { key: string; index: number }[] = [];
   for (let i = 0; i < props.length; i++) {
     if (!props[i].startsWith('@')) {
