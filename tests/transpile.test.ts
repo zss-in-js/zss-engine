@@ -1,4 +1,4 @@
-import { genBase36Hash, transpile } from '../src';
+import { genBase36Hash, transpile } from '../src/index';
 
 test('transpile handles edge cases in media queries', () => {
   const object = {
