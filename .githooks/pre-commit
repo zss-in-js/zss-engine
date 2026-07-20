@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|mjs)$' || true)
+[ -z "$files" ] && exit 0
+
+echo "$files" | xargs pnpm exec prettier --write
+echo "$files" | xargs git add
