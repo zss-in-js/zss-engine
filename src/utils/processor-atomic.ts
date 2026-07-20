@@ -2,7 +2,6 @@ import type { CSSProperties } from '../index.js';
 import { camelToKebabCase, applyCssValue, isAtRule } from './helper.js';
 import { transpileAtomic } from './transpile-atomic.js';
 import { genBase36Hash } from './hash.js';
-import { SHORTHAND_PROPERTIES } from './shorthand.js';
 
 function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: CSSProperties) {
   const queryFlat = flat as Record<string, unknown>;
@@ -21,13 +20,6 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: 
     }
   });
 }
-
-const LONG_TO_SHORT: Record<string, string> = {};
-Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
-  longhands.forEach(long => {
-    LONG_TO_SHORT[long] = shorthand;
-  });
-});
 
 function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, string>, parentAtRule?: string) {
   const resultQueue: Array<[string, string | number]> = [];
