@@ -10,7 +10,34 @@ permissions:
   contents: read
 
 jobs:
+  release_check:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.check.outputs.release }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Determine if publish should run
+        id: check
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/zss-engine@* ]]; then
+            echo "Tag push detected."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          LATEST_TAG=$(git tag --list 'zss-engine@*' --sort=-v:refname | head -1)
+          echo "package.json: zss-engine@${PKG_VERSION} / latest tag: ${LATEST_TAG:-none}"
+          if [ "$LATEST_TAG" = "zss-engine@${PKG_VERSION}" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
+    needs: release_check
+    if: needs.release_check.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -23,8 +50,20 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
-      - name: npm publish with provenance
+      - name: Install dependencies
         run: pnpm install
-      - run: pnpm build
-      - run: pnpm test
-      - run: npm publish
+      - name: Build
+        run: pnpm build
+      - name: Check if version already published
+        id: version_check
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if npm view "zss-engine@${PKG_VERSION}" version 2>/dev/null; then
+            echo "Version ${PKG_VERSION} is already published. Skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Publish
+        if: steps.version_check.outputs.skip == 'false'
+        run: npm publish
