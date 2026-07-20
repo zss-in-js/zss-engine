@@ -1,8 +1,12 @@
 import { hexToColorName } from './hex-to-color-name.js';
 
+// For <time> -related types, a time unit is mandatory; appending px is not used
 const exception = [
   'animation-iteration-count',
+  'animation-duration',
+  'animation-delay',
   'aspect-ratio',
+  'border-image-slice',
   'column-count',
   'columns',
   'fill-opacity',
@@ -12,6 +16,7 @@ const exception = [
   'flood-opacity',
   'font-size-adjust',
   'font-weight',
+  'grid-area',
   'grid-column',
   'grid-column-end',
   'grid-column-start',
@@ -21,6 +26,7 @@ const exception = [
   'hyphenate-limit-chars',
   'initial-letter',
   'line-height',
+  'mask-border-slice',
   'math-depth',
   'opacity',
   'order',
@@ -31,6 +37,8 @@ const exception = [
   'stroke-miterlimit',
   'stroke-opacity',
   'tab-size',
+  'transition-duration',
+  'transition-delay',
   'widows',
   'z-index',
   'zoom',
@@ -70,12 +78,5 @@ export const camelToKebabCase = (property: string) => {
 };
 
 export const isAtRule = (prop: string) => {
-  return (
-    prop.startsWith('@media') ||
-    prop.startsWith('@container') ||
-    prop.startsWith('@supports') ||
-    prop.startsWith('@layer') ||
-    prop.startsWith('@scope')
-  );
+  return prop.startsWith('@media') || prop.startsWith('@container') || prop.startsWith('@supports') || prop.startsWith('@layer') || prop.startsWith('@scope');
 };
-
