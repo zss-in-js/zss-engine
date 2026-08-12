@@ -25,7 +25,11 @@ const createKeyframes = (property: string, content: Property) => {
   return keyframesRules;
 };
 
-export function transpile(object: Record<string, CSSProperties>, base36Hash?: string, core?: string) {
+export function transpile(
+  object: Record<string, CSSProperties>,
+  base36Hash?: string,
+  core?: string,
+) {
   let styleSheet = '';
   const mediaQueries: { media: string; css: string }[] = [];
 
@@ -39,7 +43,11 @@ export function transpile(object: Record<string, CSSProperties>, base36Hash?: st
     return `${indent}${cssProp}: ${value};\n`;
   };
 
-  const stringConverter = (className: string, properties: Property, indentLevel: number): Property => {
+  const stringConverter = (
+    className: string,
+    properties: Property,
+    indentLevel: number,
+  ): Property => {
     const classSelector: Property = {};
     const innerIndent = ' '.repeat(indentLevel + 1);
     let cssRule = '';
@@ -55,7 +63,9 @@ export function transpile(object: Record<string, CSSProperties>, base36Hash?: st
         } else if (!property.startsWith('@')) {
           const kebabPseudoSelector = camelToKebabCase(property);
           const isPseudo = property.startsWith(':') || property.startsWith('[');
-          const selector = isPseudo ? className + ':not(#\\#)' + kebabPseudoSelector : className + kebabPseudoSelector;
+          const selector = isPseudo
+            ? className + ':not(#\\#)' + kebabPseudoSelector
+            : className + kebabPseudoSelector;
           const styles = stringConverter(selector, value, indentLevel);
           Object.assign(classSelector, styles);
         } else if (isAtRule(property)) {
@@ -74,18 +84,37 @@ export function transpile(object: Record<string, CSSProperties>, base36Hash?: st
 
                 if (typeof mediaValue === 'object' && mediaValue !== null) {
                   for (const pseudoProp in mediaValue) {
-                    if (Object.prototype.hasOwnProperty.call(mediaValue, pseudoProp)) {
+                    if (
+                      Object.prototype.hasOwnProperty.call(
+                        mediaValue,
+                        pseudoProp,
+                      )
+                    ) {
                       const CSSProp = camelToKebabCase(pseudoProp);
-                      const applyValue = applyCssValue(mediaValue[pseudoProp] as string | number, CSSProp);
-                      pseudoClassRule += rules(innerIndent + '  ', { [pseudoProp]: applyValue }, pseudoProp);
+                      const applyValue = applyCssValue(
+                        mediaValue[pseudoProp] as string | number,
+                        CSSProp,
+                      );
+                      pseudoClassRule += rules(
+                        innerIndent + '  ',
+                        { [pseudoProp]: applyValue },
+                        pseudoProp,
+                      );
                     }
                   }
                 }
                 nestedRules += `${innerIndent}${className}${increaseKebabMediaProp} {\n${pseudoClassRule}${innerIndent}}\n`;
               } else {
                 const CSSProp = camelToKebabCase(mediaProp);
-                const applyValue = applyCssValue(mediaValue as string | number, CSSProp);
-                regularRules += rules(innerIndent + '  ', { [mediaProp]: applyValue }, mediaProp);
+                const applyValue = applyCssValue(
+                  mediaValue as string | number,
+                  CSSProp,
+                );
+                regularRules += rules(
+                  innerIndent + '  ',
+                  { [mediaProp]: applyValue },
+                  mediaProp,
+                );
               }
             }
           }
@@ -113,7 +142,11 @@ export function transpile(object: Record<string, CSSProperties>, base36Hash?: st
       const keyframesContent = object[property];
       styleSheet += createKeyframes(property, keyframesContent);
     }
-    const classSelectors = stringConverter(classNameApply(property), object[property], 1);
+    const classSelectors = stringConverter(
+      classNameApply(property),
+      object[property],
+      1,
+    );
     for (const selector in classSelectors) {
       if (!selector.startsWith('@keyframes') && classSelectors[selector]) {
         styleSheet += selector + ' {\n' + classSelectors[selector] + '}\n';
