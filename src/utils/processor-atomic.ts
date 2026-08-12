@@ -3,7 +3,11 @@ import { camelToKebabCase, applyCssValue, isAtRule } from './helper.js';
 import { transpileAtomic } from './transpile-atomic.js';
 import { genBase36Hash } from './hash.js';
 
-function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: CSSProperties) {
+function splitAtomicAndNested(
+  obj: CSSProperties,
+  flat: CSSProperties,
+  nonFlat: CSSProperties,
+) {
   const queryFlat = flat as Record<string, unknown>;
   const queryNonFlat = nonFlat as Record<string, unknown>;
   Object.entries(obj).forEach(([property, value]) => {
@@ -14,14 +18,19 @@ function splitAtomicAndNested(obj: CSSProperties, flat: CSSProperties, nonFlat: 
       const innerNonFlat: CSSProperties = {};
       splitAtomicAndNested(value as CSSProperties, innerFlat, innerNonFlat);
       if (Object.keys(innerFlat).length) queryFlat[property] = innerFlat;
-      if (Object.keys(innerNonFlat).length) queryNonFlat[property] = innerNonFlat;
+      if (Object.keys(innerNonFlat).length)
+        queryNonFlat[property] = innerNonFlat;
     } else {
       queryFlat[property] = value;
     }
   });
 }
 
-function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, string>, parentAtRule?: string) {
+function processAtomicProps(
+  flatProps: CSSProperties,
+  atomicMap: Map<string, string>,
+  parentAtRule?: string,
+) {
   const resultQueue: Array<[string, string | number]> = [];
   for (const [key, style] of Object.entries(flatProps)) {
     if (isAtRule(key)) {
@@ -36,7 +45,9 @@ function processAtomicProps(flatProps: CSSProperties, atomicMap: Map<string, str
     const CSSProp = camelToKebabCase(property);
     const normalizedValue = applyCssValue(value, CSSProp);
     const singlePropObj = { [property]: normalizedValue };
-    const styleObj = parentAtRule ? { [parentAtRule]: singlePropObj } : singlePropObj;
+    const styleObj = parentAtRule
+      ? { [parentAtRule]: singlePropObj }
+      : singlePropObj;
     const atomicHash = genBase36Hash(styleObj, 1, 8);
 
     if (atomicMap.has(atomicHash)) continue;
