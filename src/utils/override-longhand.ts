@@ -27,17 +27,13 @@ export const overrideLonghand = (style: CSSProperties) => {
     }
   }
 
-  // Determine which longhands to remove
+  // Determine which longhands to remove.
   for (const { key, index } of plainProps) {
     const kebab = camelToKebabCase(key);
-    if (!SHORTHAND_PROPERTIES[kebab]) {
-      // is longhand
-      const longhands = LONG_TO_SHORT[kebab] || [];
-      for (const shorthand of longhands) {
-        if (shorthandsInStyle[shorthand] > index) {
-          propsToRemove.add(key);
-          break;
-        }
+    for (const shorthand of LONG_TO_SHORT[kebab] || []) {
+      if (shorthandsInStyle[shorthand] > index) {
+        propsToRemove.add(key);
+        break;
       }
     }
   }
