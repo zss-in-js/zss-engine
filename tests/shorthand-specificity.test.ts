@@ -7,9 +7,9 @@ describe('shorthand cascade depth', () => {
   test('depth grows with each shorthand level', () => {
     expect(getPropertyDepth('color')).toBe(0);
     expect(getPropertyDepth('border')).toBe(0);
-    expect(getPropertyDepth('border-top')).toBe(1);
+    expect(getPropertyDepth('border-top')).toBe(2);
     expect(getPropertyDepth('border-width')).toBe(1);
-    expect(getPropertyDepth('border-top-width')).toBe(2);
+    expect(getPropertyDepth('border-top-width')).toBe(3);
   });
 
   test('logical border properties nest under border', () => {
@@ -23,6 +23,27 @@ describe('shorthand cascade depth', () => {
     expect(getPropertyDepth('border-inline-start-width')).toBe(3);
   });
 
+  test('physical and logical border counterparts have matching depths', () => {
+    for (const [axis, physicalStart, physicalEnd] of [
+      ['block', 'top', 'bottom'],
+      ['inline', 'left', 'right'],
+    ]) {
+      expect(getPropertyDepth(`border-${physicalStart}`)).toBe(2);
+      expect(getPropertyDepth(`border-${physicalEnd}`)).toBe(2);
+      expect(getPropertyDepth(`border-${axis}-start`)).toBe(2);
+      expect(getPropertyDepth(`border-${axis}-end`)).toBe(2);
+
+      for (const component of ['width', 'style', 'color']) {
+        expect(getPropertyDepth(`border-${physicalStart}-${component}`)).toBe(
+          3,
+        );
+        expect(getPropertyDepth(`border-${physicalEnd}-${component}`)).toBe(3);
+        expect(getPropertyDepth(`border-${axis}-start-${component}`)).toBe(3);
+        expect(getPropertyDepth(`border-${axis}-end-${component}`)).toBe(3);
+      }
+    }
+  });
+
   test('depth follows the graph, not the hyphen count', () => {
     // flex-flow and flex-direction both have one hyphen
     expect(getPropertyDepth('flex-flow')).toBe(0);
@@ -33,11 +54,19 @@ describe('shorthand cascade depth', () => {
   });
 
   test('box model shorthands cover their physical and logical longhands', () => {
-    for (const box of ['margin', 'padding', 'scroll-margin', 'scroll-padding']) {
+    for (const box of [
+      'margin',
+      'padding',
+      'scroll-margin',
+      'scroll-padding',
+    ]) {
       expect(getPropertyDepth(box)).toBe(0);
-      expect(getPropertyDepth(`${box}-top`)).toBe(1);
       expect(getPropertyDepth(`${box}-block`)).toBe(1);
       expect(getPropertyDepth(`${box}-inline`)).toBe(1);
+      expect(getPropertyDepth(`${box}-top`)).toBe(2);
+      expect(getPropertyDepth(`${box}-right`)).toBe(2);
+      expect(getPropertyDepth(`${box}-bottom`)).toBe(2);
+      expect(getPropertyDepth(`${box}-left`)).toBe(2);
       expect(getPropertyDepth(`${box}-block-start`)).toBe(2);
       expect(getPropertyDepth(`${box}-inline-end`)).toBe(2);
     }
@@ -45,9 +74,14 @@ describe('shorthand cascade depth', () => {
 
   test('inset covers physical and logical offsets', () => {
     expect(getPropertyDepth('inset')).toBe(0);
-    expect(getPropertyDepth('top')).toBe(1);
     expect(getPropertyDepth('inset-block')).toBe(1);
+    expect(getPropertyDepth('inset-inline')).toBe(1);
+    expect(getPropertyDepth('top')).toBe(2);
+    expect(getPropertyDepth('right')).toBe(2);
+    expect(getPropertyDepth('bottom')).toBe(2);
+    expect(getPropertyDepth('left')).toBe(2);
     expect(getPropertyDepth('inset-block-start')).toBe(2);
+    expect(getPropertyDepth('inset-inline-end')).toBe(2);
   });
 
   test('gap, overflow, place-* and overscroll-behavior are ranked', () => {
@@ -104,9 +138,15 @@ describe('shorthand cascade depth', () => {
 
 describe('transpileAtomic specificity', () => {
   test('each level adds one :not(#\\#)', () => {
-    expect(transpileAtomic('border', '1px solid red', 'h')).toBe('.h { border: 1px solid red; }');
-    expect(transpileAtomic('borderTop', '1px solid red', 'h')).toBe(`.h${not} { border-top: 1px solid red; }`);
-    expect(transpileAtomic('borderTopWidth', 2, 'h')).toBe(`.h${not}${not} { border-top-width: 2px; }`);
+    expect(transpileAtomic('border', '1px solid red', 'h')).toBe(
+      '.h { border: 1px solid red; }',
+    );
+    expect(transpileAtomic('borderTop', '1px solid red', 'h')).toBe(
+      `.h${not}${not} { border-top: 1px solid red; }`,
+    );
+    expect(transpileAtomic('borderTopWidth', 2, 'h')).toBe(
+      `.h${not}${not}${not} { border-top-width: 2px; }`,
+    );
   });
 
   test('longhand keeps winning over its shorthand regardless of insertion order', () => {
@@ -120,6 +160,8 @@ describe('transpileAtomic specificity', () => {
   });
 
   test('pseudo suffix comes after the specificity bump', () => {
-    expect(transpileAtomic('borderTopWidth', 2, 'h', ':hover')).toBe(`.h${not}${not}:hover { border-top-width: 2px; }`);
+    expect(transpileAtomic('borderTopWidth', 2, 'h', ':hover')).toBe(
+      `.h${not}${not}${not}:hover { border-top-width: 2px; }`,
+    );
   });
 });
