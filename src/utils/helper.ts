@@ -44,17 +44,24 @@ const exception = [
   'zoom',
 ];
 
-export const exceptionCamelCase = exception.map(prop => prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase()));
+export const exceptionCamelCase = exception.map((prop) =>
+  prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase()),
+);
 
 const convertHexToColorName = (value: string): string => {
-  return value.replace(/#[0-9a-fA-F]{3,6}\b/g, match => {
+  return value.replace(/#[0-9a-fA-F]{3,6}\b/g, (match) => {
     return hexToColorName[match.toLowerCase()] || match;
   });
 };
 
-export const applyCssValue = (value: string | number, cssProp: string): string => {
+export const applyCssValue = (
+  value: string | number,
+  cssProp: string,
+): string => {
   if (typeof value === 'number') {
-    return exception.includes(cssProp) || cssProp.startsWith('--') ? value.toString() : value + 'px';
+    return exception.includes(cssProp) || cssProp.startsWith('--')
+      ? value.toString()
+      : value + 'px';
   }
 
   return convertHexToColorName(value);
@@ -78,5 +85,11 @@ export const camelToKebabCase = (property: string) => {
 };
 
 export const isAtRule = (prop: string) => {
-  return prop.startsWith('@media') || prop.startsWith('@container') || prop.startsWith('@supports') || prop.startsWith('@layer') || prop.startsWith('@scope');
+  return (
+    prop.startsWith('@media') ||
+    prop.startsWith('@container') ||
+    prop.startsWith('@supports') ||
+    prop.startsWith('@layer') ||
+    prop.startsWith('@scope')
+  );
 };
