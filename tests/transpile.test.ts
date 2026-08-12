@@ -211,3 +211,44 @@ test('transpile handles @media with only nested rules', () => {
   expect(styleSheet).toContain(':hover');
   expect(styleSheet).toContain('background-color: gray;');
 });
+
+test('transpile ignores inherited and unsupported keyframe properties', () => {
+  const inheritedFrame = { color: 'red' };
+  const frame = Object.assign(Object.create(inheritedFrame), {
+    opacity: 0,
+    metadata: { name: 'start' },
+  });
+  const inheritedKeyframes = { '50%': { opacity: 0.5 } };
+  const keyframes = Object.assign(Object.create(inheritedKeyframes), {
+    '0%': frame,
+  });
+
+  const { styleSheet } = transpile({ '@keyframes guarded': keyframes } as unknown as Parameters<typeof transpile>[0], 'test');
+
+  expect(styleSheet).toContain('opacity: 0;');
+  expect(styleSheet).not.toContain('50%');
+  expect(styleSheet).not.toContain('color: red;');
+  expect(styleSheet).toContain('@keyframes guarded {\n  0% {\n    opacity: 0;\n  }\n}');
+});
+
+test('transpile ignores inherited properties, unknown at-rules, and invalid query selectors', () => {
+  const query = Object.assign(Object.create({ inheritedColor: 'red' }), {
+    ':hover': 'invalid',
+    ':focus': null,
+    ':active': Object.assign(Object.create({ inheritedOpacity: 0 }), { color: 'green' }),
+  });
+  const styles = Object.assign(Object.create({ inheritedDisplay: 'block' }), {
+    color: 'blue',
+    '@unknown rule': { color: 'red' },
+    '@media (min-width: 1px)': query,
+  });
+
+  const { styleSheet } = transpile({ component: styles } as unknown as Parameters<typeof transpile>[0], 'guarded');
+
+  expect(styleSheet).toContain('color: blue;');
+  expect(styleSheet).toContain('@media (min-width: 1px)');
+  expect(styleSheet).not.toContain('inherited');
+  expect(styleSheet).not.toContain('@unknown');
+  expect(styleSheet).not.toContain('invalid');
+  expect(styleSheet).not.toContain('inherited-opacity');
+});
