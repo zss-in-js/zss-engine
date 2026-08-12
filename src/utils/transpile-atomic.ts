@@ -1,7 +1,12 @@
 import { applyCssValue, camelToKebabCase, isAtRule } from './helper.js';
 import { getPropertyDepth } from './shorthand.js';
 
-function transpileAtomic(property: string, value: string | number, hash: string, pseudo?: string): string {
+function transpileAtomic(
+  property: string,
+  value: string | number,
+  hash: string,
+  pseudo?: string,
+): string {
   if (typeof value === 'string' || typeof value === 'number') {
     const CSSProp = camelToKebabCase(property);
     const applyValue = applyCssValue(value, CSSProp);
