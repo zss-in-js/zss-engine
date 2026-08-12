@@ -140,6 +140,16 @@ export const DIRECT_LONGHANDS: Readonly<Record<string, readonly string[]>> = {
     'border-end-start-radius',
     'border-end-end-radius',
   ],
+  'corner-shape': [
+    'corner-top-right-shape',
+    'corner-top-left-shape',
+    'corner-bottom-right-shape',
+    'corner-bottom-left-shape',
+    'corner-start-start-shape',
+    'corner-start-end-shape',
+    'corner-end-start-shape',
+    'corner-end-end-shape',
+  ],
   transition: [
     'transition-delay',
     'transition-duration',
