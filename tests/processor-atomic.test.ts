@@ -148,19 +148,26 @@ describe('processAtomicProps', () => {
         margin: '10px',
         marginTop: '20px',
       },
-      atomicMap
+      atomicMap,
     );
     expect(atomicMap.size).toBe(2);
 
     const sheets = Array.from(atomicMap.values()).join('');
-    expect(sheets).not.toContain('margin-top:20px');
+    expect(sheets).toContain('margin: 10px');
+    expect(sheets).toContain('margin-top: 20px');
+    expect(sheets).toContain(':not(#\\#) { margin-top: 20px; }');
   });
 
-  test('ignores longhand when shorthand is present', () => {
+  test('keeps longhand when shorthand was already processed', () => {
     processAtomicProps({ margin: '10px' }, atomicMap);
     processAtomicProps({ marginTop: '5px' }, atomicMap);
 
     expect(atomicMap.size).toBe(2);
+
+    const sheets = Array.from(atomicMap.values()).join('');
+    expect(sheets).toContain('margin: 10px');
+    expect(sheets).toContain('margin-top: 5px');
+    expect(sheets).toContain(':not(#\\#) { margin-top: 5px; }');
   });
 
   test('processes multiple atomic properties', () => {
@@ -168,7 +175,7 @@ describe('processAtomicProps', () => {
       {
         color: 'green',
       },
-      atomicMap
+      atomicMap,
     );
 
     expect(atomicMap.size).toBe(1);
