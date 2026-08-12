@@ -1,8 +1,15 @@
 // reference [https://github.com/ota-meshi/eslint-plugin-css/blob/main/lib/utils/resource/index.ts]
 
-export const SHORTHAND_PROPERTIES: Record<string, string[]> = {
-  margin: ['margin-top', 'margin-bottom', 'margin-left', 'margin-right'],
-  padding: ['padding-top', 'padding-bottom', 'padding-left', 'padding-right'],
+const DIRECT_LONGHANDS: Record<string, string[]> = {
+  margin: ['margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'margin-block', 'margin-inline'],
+  'margin-block': ['margin-block-start', 'margin-block-end'],
+  'margin-inline': ['margin-inline-start', 'margin-inline-end'],
+  padding: ['padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'padding-block', 'padding-inline'],
+  'padding-block': ['padding-block-start', 'padding-block-end'],
+  'padding-inline': ['padding-inline-start', 'padding-inline-end'],
+  inset: ['top', 'bottom', 'left', 'right', 'inset-block', 'inset-inline'],
+  'inset-block': ['inset-block-start', 'inset-block-end'],
+  'inset-inline': ['inset-inline-start', 'inset-inline-end'],
   background: [
     'background-image',
     'background-size',
@@ -13,31 +20,38 @@ export const SHORTHAND_PROPERTIES: Record<string, string[]> = {
     'background-attachment',
     'background-color',
   ],
+  'background-position': ['background-position-x', 'background-position-y'],
   font: ['font-style', 'font-variant', 'font-weight', 'font-stretch', 'font-size', 'font-family', 'line-height'],
-  border: [
-    'border-top-width',
-    'border-bottom-width',
-    'border-left-width',
-    'border-right-width',
-    'border-top-style',
-    'border-bottom-style',
-    'border-left-style',
-    'border-right-style',
-    'border-top-color',
-    'border-bottom-color',
-    'border-left-color',
-    'border-right-color',
+  'font-variant': [
+    'font-variant-caps',
+    'font-variant-numeric',
+    'font-variant-ligatures',
+    'font-variant-east-asian',
+    'font-variant-alternates',
+    'font-variant-position',
+    'font-variant-emoji',
   ],
+  'font-synthesis': ['font-synthesis-weight', 'font-synthesis-style', 'font-synthesis-small-caps'],
+  border: ['border-width', 'border-style', 'border-color', 'border-top', 'border-bottom', 'border-left', 'border-right', 'border-block', 'border-inline'],
   'border-top': ['border-top-width', 'border-top-style', 'border-top-color'],
   'border-bottom': ['border-bottom-width', 'border-bottom-style', 'border-bottom-color'],
   'border-left': ['border-left-width', 'border-left-style', 'border-left-color'],
   'border-right': ['border-right-width', 'border-right-style', 'border-right-color'],
-  'border-width': ['border-top-width', 'border-bottom-width', 'border-left-width', 'border-right-width'],
-  'border-style': ['border-top-style', 'border-bottom-style', 'border-left-style', 'border-right-style'],
-  'border-color': ['border-top-color', 'border-bottom-color', 'border-left-color', 'border-right-color'],
+  'border-width': ['border-top-width', 'border-bottom-width', 'border-left-width', 'border-right-width', 'border-block-width', 'border-inline-width'],
+  'border-style': ['border-top-style', 'border-bottom-style', 'border-left-style', 'border-right-style', 'border-block-style', 'border-inline-style'],
+  'border-color': ['border-top-color', 'border-bottom-color', 'border-left-color', 'border-right-color', 'border-block-color', 'border-inline-color'],
   'list-style': ['list-style-type', 'list-style-position', 'list-style-image'],
-  'border-radius': ['border-top-right-radius', 'border-top-left-radius', 'border-bottom-right-radius', 'border-bottom-left-radius'],
-  transition: ['transition-delay', 'transition-duration', 'transition-property', 'transition-timing-function'],
+  'border-radius': [
+    'border-top-right-radius',
+    'border-top-left-radius',
+    'border-bottom-right-radius',
+    'border-bottom-left-radius',
+    'border-start-start-radius',
+    'border-start-end-radius',
+    'border-end-start-radius',
+    'border-end-end-radius',
+  ],
+  transition: ['transition-delay', 'transition-duration', 'transition-property', 'transition-timing-function', 'transition-behavior'],
   animation: [
     'animation-name',
     'animation-duration',
@@ -47,43 +61,86 @@ export const SHORTHAND_PROPERTIES: Record<string, string[]> = {
     'animation-direction',
     'animation-fill-mode',
     'animation-play-state',
+    'animation-timeline',
+    'animation-range',
   ],
+  'animation-range': ['animation-range-start', 'animation-range-end'],
+  'border-block': ['border-block-start', 'border-block-end', 'border-block-width', 'border-block-style', 'border-block-color'],
   'border-block-end': ['border-block-end-width', 'border-block-end-style', 'border-block-end-color'],
   'border-block-start': ['border-block-start-width', 'border-block-start-style', 'border-block-start-color'],
+  'border-block-width': ['border-block-start-width', 'border-block-end-width'],
+  'border-block-style': ['border-block-start-style', 'border-block-end-style'],
+  'border-block-color': ['border-block-start-color', 'border-block-end-color'],
   'border-image': ['border-image-source', 'border-image-slice', 'border-image-width', 'border-image-outset', 'border-image-repeat'],
+  'border-inline': ['border-inline-start', 'border-inline-end', 'border-inline-width', 'border-inline-style', 'border-inline-color'],
   'border-inline-end': ['border-inline-end-width', 'border-inline-end-style', 'border-inline-end-color'],
   'border-inline-start': ['border-inline-start-width', 'border-inline-start-style', 'border-inline-start-color'],
+  'border-inline-width': ['border-inline-start-width', 'border-inline-end-width'],
+  'border-inline-style': ['border-inline-start-style', 'border-inline-end-style'],
+  'border-inline-color': ['border-inline-start-color', 'border-inline-end-color'],
   'column-rule': ['column-rule-width', 'column-rule-style', 'column-rule-color'],
   columns: ['column-width', 'column-count'],
   flex: ['flex-grow', 'flex-shrink', 'flex-basis'],
   'flex-flow': ['flex-direction', 'flex-wrap'],
-  grid: [
-    'grid-template-rows',
-    'grid-template-columns',
-    'grid-template-areas',
-    'grid-auto-rows',
-    'grid-auto-columns',
-    'grid-auto-flow',
-    'grid-column-gap',
-    'grid-row-gap',
-  ],
-  'grid-area': ['grid-row-start', 'grid-column-start', 'grid-row-end', 'grid-column-end'],
+  grid: ['grid-template', 'grid-auto-rows', 'grid-auto-columns', 'grid-auto-flow', 'grid-gap', 'gap'],
+  'grid-template': ['grid-template-columns', 'grid-template-rows', 'grid-template-areas'],
+  'grid-area': ['grid-row', 'grid-column'],
   'grid-column': ['grid-column-start', 'grid-column-end'],
   'grid-gap': ['grid-row-gap', 'grid-column-gap'],
   'grid-row': ['grid-row-start', 'grid-row-end'],
-  'grid-template': ['grid-template-columns', 'grid-template-rows', 'grid-template-areas'],
+  gap: ['row-gap', 'column-gap'],
+  'place-items': ['align-items', 'justify-items'],
+  'place-content': ['align-content', 'justify-content'],
+  'place-self': ['align-self', 'justify-self'],
+  overflow: ['overflow-x', 'overflow-y'],
+  'overscroll-behavior': ['overscroll-behavior-x', 'overscroll-behavior-y'],
+  'scroll-margin': ['scroll-margin-top', 'scroll-margin-bottom', 'scroll-margin-left', 'scroll-margin-right', 'scroll-margin-block', 'scroll-margin-inline'],
+  'scroll-margin-block': ['scroll-margin-block-start', 'scroll-margin-block-end'],
+  'scroll-margin-inline': ['scroll-margin-inline-start', 'scroll-margin-inline-end'],
+  'scroll-padding': [
+    'scroll-padding-top',
+    'scroll-padding-bottom',
+    'scroll-padding-left',
+    'scroll-padding-right',
+    'scroll-padding-block',
+    'scroll-padding-inline',
+  ],
+  'scroll-padding-block': ['scroll-padding-block-start', 'scroll-padding-block-end'],
+  'scroll-padding-inline': ['scroll-padding-inline-start', 'scroll-padding-inline-end'],
+  'scroll-timeline': ['scroll-timeline-name', 'scroll-timeline-axis'],
+  'view-timeline': ['view-timeline-name', 'view-timeline-axis', 'view-timeline-inset'],
+  container: ['container-name', 'container-type'],
   outline: ['outline-color', 'outline-style', 'outline-width'],
-  'text-decoration': ['text-decoration-color', 'text-decoration-style', 'text-decoration-line'],
+  'text-decoration': ['text-decoration-color', 'text-decoration-style', 'text-decoration-line', 'text-decoration-thickness'],
   'text-emphasis': ['text-emphasis-style', 'text-emphasis-color'],
+  'white-space': ['white-space-collapse', 'white-space-trim'],
+  'text-wrap': ['text-wrap-mode', 'text-wrap-style'],
+  offset: ['offset-position', 'offset-path', 'offset-distance', 'offset-rotate', 'offset-anchor'],
+  caret: ['caret-color', 'caret-shape'],
   mask: ['mask-image', 'mask-mode', 'mask-position', 'mask-size', 'mask-repeat', 'mask-origin', 'mask-clip', 'mask-composite'],
+  'mask-border': ['mask-border-source', 'mask-border-slice', 'mask-border-width', 'mask-border-outset', 'mask-border-repeat', 'mask-border-mode'],
 };
 
-export const LONG_TO_SHORT: Record<string, string[]> = {};
-Object.entries(SHORTHAND_PROPERTIES).forEach(([shorthand, longhands]) => {
-  longhands.forEach(longhand => {
-    if (!LONG_TO_SHORT[longhand]) {
-      LONG_TO_SHORT[longhand] = [];
-    }
-    LONG_TO_SHORT[longhand].push(shorthand);
-  });
-});
+const DIRECT_SHORTHANDS: Record<string, string[]> = {};
+for (const [shorthand, longhands] of Object.entries(DIRECT_LONGHANDS)) {
+  for (const longhand of longhands) {
+    if (!DIRECT_SHORTHANDS[longhand]) DIRECT_SHORTHANDS[longhand] = [];
+    DIRECT_SHORTHANDS[longhand].push(shorthand);
+  }
+}
+
+const depthCache = new Map<string, number>();
+
+export const getPropertyDepth = (property: string): number => {
+  const cached = depthCache.get(property);
+  if (cached !== undefined) return cached;
+  depthCache.set(property, 0);
+
+  let depth = 0;
+  for (const shorthand of DIRECT_SHORTHANDS[property] || []) {
+    depth = Math.max(depth, getPropertyDepth(shorthand) + 1);
+  }
+
+  depthCache.set(property, depth);
+  return depth;
+};
