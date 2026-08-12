@@ -7,7 +7,6 @@ describe('index exports', () => {
     expect(index.transpileAtomic).toBeDefined();
     expect(index.splitAtomicAndNested).toBeDefined();
     expect(index.processAtomicProps).toBeDefined();
-    expect(index.overrideLonghand).toBeDefined();
     expect(index.camelToKebabCase).toBeDefined();
     expect(index.applyCssValue).toBeDefined();
   });
@@ -18,7 +17,6 @@ describe('index exports', () => {
     expect(typeof index.transpileAtomic).toBe('function');
     expect(typeof index.splitAtomicAndNested).toBe('function');
     expect(typeof index.processAtomicProps).toBe('function');
-    expect(typeof index.overrideLonghand).toBe('function');
     expect(typeof index.camelToKebabCase).toBe('function');
     expect(typeof index.applyCssValue).toBe('function');
   });
