@@ -1,39 +1,59 @@
 import { getPropertyDepth } from '../src/utils/shorthand';
+import { DIRECT_LONGHANDS } from '../src/utils/shorthand-graph';
 
 const BOX_FAMILIES = ['margin', 'padding', 'scroll-margin', 'scroll-padding'];
+const LOGICAL_PHYSICAL_EDGES: [string, string][] = [
+  ['block-start', 'top'],
+  ['block-end', 'bottom'],
+  ['inline-start', 'left'],
+  ['inline-end', 'right'],
+];
+const BORDER_VALUES = ['width', 'style', 'color'];
 const EDGES = [
-  'top',
-  'bottom',
-  'left',
-  'right',
-  'block-start',
-  'block-end',
-  'inline-start',
-  'inline-end',
+  ...LOGICAL_PHYSICAL_EDGES.map(([, physical]) => physical),
+  ...LOGICAL_PHYSICAL_EDGES.map(([logical]) => logical),
 ];
 
 /**
  * Same computed property under its logical and its physical name. The pair has
  * to land on the same depth, otherwise one spelling silently outranks the other.
+ * The list is also what folds the two spellings together when the coverage of a
+ * property is compared with another's, so a missing entry costs detection there
+ * as well.
  */
 const LOGICAL_PHYSICAL_PAIRS: [string, string][] = [
-  ...BOX_FAMILIES.flatMap((family): [string, string][] => [
-    [`${family}-block-start`, `${family}-top`],
-    [`${family}-block-end`, `${family}-bottom`],
-    [`${family}-inline-start`, `${family}-left`],
-    [`${family}-inline-end`, `${family}-right`],
+  ...BOX_FAMILIES.flatMap((family): [string, string][] =>
+    LOGICAL_PHYSICAL_EDGES.map(([logical, physical]) => [
+      `${family}-${logical}`,
+      `${family}-${physical}`,
+    ]),
+  ),
+  ...LOGICAL_PHYSICAL_EDGES.map(([logical, physical]): [string, string] => [
+    `inset-${logical}`,
+    physical,
   ]),
-  ['inset-block-start', 'top'],
-  ['inset-block-end', 'bottom'],
-  ['inset-inline-start', 'left'],
-  ['inset-inline-end', 'right'],
-  ['border-block-start-width', 'border-top-width'],
-  ['border-block-end-style', 'border-bottom-style'],
-  ['border-inline-start-color', 'border-left-color'],
-  ['border-inline-end-width', 'border-right-width'],
+  ...LOGICAL_PHYSICAL_EDGES.flatMap(
+    ([logical, physical]): [string, string][] => [
+      [`border-${logical}`, `border-${physical}`],
+      ...BORDER_VALUES.map((value): [string, string] => [
+        `border-${logical}-${value}`,
+        `border-${physical}-${value}`,
+      ]),
+    ],
+  ),
+  ['border-start-start-radius', 'border-top-left-radius'],
+  ['border-start-end-radius', 'border-top-right-radius'],
+  ['border-end-start-radius', 'border-bottom-left-radius'],
+  ['border-end-end-radius', 'border-bottom-right-radius'],
+  ['corner-start-start-shape', 'corner-top-left-shape'],
+  ['corner-start-end-shape', 'corner-top-right-shape'],
+  ['corner-end-start-shape', 'corner-bottom-left-shape'],
+  ['corner-end-end-shape', 'corner-bottom-right-shape'],
   ['block-size', 'height'],
   ['inline-size', 'width'],
   ['min-block-size', 'min-height'],
+  ['min-inline-size', 'min-width'],
+  ['max-block-size', 'max-height'],
   ['max-inline-size', 'max-width'],
   ['overflow-block', 'overflow-y'],
   ['overflow-inline', 'overflow-x'],
@@ -41,8 +61,6 @@ const LOGICAL_PHYSICAL_PAIRS: [string, string][] = [
   ['overscroll-behavior-inline', 'overscroll-behavior-x'],
   ['contain-intrinsic-block-size', 'contain-intrinsic-height'],
   ['contain-intrinsic-inline-size', 'contain-intrinsic-width'],
-  ['border-start-start-radius', 'border-top-left-radius'],
-  ['border-end-end-radius', 'border-bottom-right-radius'],
 ];
 
 describe('getPropertyDepth', () => {
@@ -123,6 +141,60 @@ describe('getPropertyDepth', () => {
       expect(getPropertyDepth(logical)).toBe(getPropertyDepth(physical));
     },
   );
+
+  /**
+   * Two properties with no edge between them can still contain one another, and
+   * that is where a missing edge hides. Until `padding-block` listed the physical
+   * edges it sets, it covered `padding-top` while sharing its depth. Fold the two
+   * spellings of one computed property together, then every property that covers
+   * strictly more than another has to rank above it.
+   */
+  it('ranks a property above everything it covers, edge or not', () => {
+    const alias = new Map(LOGICAL_PHYSICAL_PAIRS);
+    const nodes = new Set(
+      Object.entries(DIRECT_LONGHANDS).flatMap(([shorthand, longhands]) => [
+        shorthand,
+        ...longhands,
+      ]),
+    );
+
+    const covered = new Map<string, Set<string>>();
+    const coverageOf = (property: string): Set<string> => {
+      const cached = covered.get(property);
+      if (cached) return cached;
+
+      const longhands = DIRECT_LONGHANDS[property];
+      const coverage = longhands
+        ? new Set(longhands.flatMap((longhand) => [...coverageOf(longhand)]))
+        : new Set([alias.get(property) ?? property]);
+
+      covered.set(property, coverage);
+      return coverage;
+    };
+
+    const unranked: string[] = [];
+
+    for (const property of nodes) {
+      const coverage = coverageOf(property);
+
+      for (const other of nodes) {
+        if (other === property) continue;
+
+        const otherCoverage = coverageOf(other);
+        const covers =
+          coverage.size > otherCoverage.size &&
+          [...otherCoverage].every((leaf) => coverage.has(leaf));
+
+        if (covers && getPropertyDepth(property) >= getPropertyDepth(other)) {
+          unranked.push(
+            `${property} covers ${other} but does not rank above it`,
+          );
+        }
+      }
+    }
+
+    expect(unranked).toEqual([]);
+  });
 
   it('ranks a logical axis above the shorthand that resets it', () => {
     expect(getPropertyDepth('overflow')).toBe(0);
