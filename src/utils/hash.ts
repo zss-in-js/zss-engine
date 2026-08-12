@@ -11,7 +11,7 @@ function deepNormalize(obj: unknown): string {
 
   const recordObj = obj as Record<string, unknown>;
   const keys = Object.keys(recordObj).sort();
-  const pairs = keys.map(key => `"${key}":${deepNormalize(recordObj[key])}`);
+  const pairs = keys.map((key) => `"${key}":${deepNormalize(recordObj[key])}`);
   return '{' + pairs.join(',') + '}';
 }
 
