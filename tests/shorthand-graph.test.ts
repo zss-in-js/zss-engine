@@ -1,6 +1,5 @@
 import { getPropertyDepth } from '../src/utils/shorthand';
 import { DIRECT_LONGHANDS } from '../src/utils/shorthand-graph';
-
 describe('shorthand graph invariants', () => {
   const entries = Object.entries(DIRECT_LONGHANDS);
   const nodes = new Set(
@@ -19,6 +18,12 @@ describe('shorthand graph invariants', () => {
     }
   });
 
+  /**
+   * Depth is defined as the longest path into a node, so it rises across every
+   * edge for free — as long as there is no cycle to make the recursion bottom
+   * out at zero. This is the test that keeps that assumption true; ranking a
+   * pair that shares no edge belongs to the depth suite.
+   */
   it('is acyclic', () => {
     const visiting = new Set<string>();
     const visited = new Set<string>();
@@ -39,16 +44,6 @@ describe('shorthand graph invariants', () => {
 
     for (const node of nodes) visit(node, []);
     expect(visited).toEqual(nodes);
-  });
-
-  it('increases depth across every graph edge', () => {
-    for (const [shorthand, longhands] of entries) {
-      for (const longhand of longhands) {
-        expect(getPropertyDepth(longhand)).toBeGreaterThan(
-          getPropertyDepth(shorthand),
-        );
-      }
-    }
   });
 
   it('returns the independently calculated longest-path depth for every node', () => {
