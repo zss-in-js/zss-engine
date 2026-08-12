@@ -2,6 +2,7 @@ name: Publish Package
 
 on:
   push:
+    branches: ['main']
     tags:
       - 'zss-engine@*'
 
