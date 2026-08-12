@@ -1,17 +1,11 @@
 import { applyCssValue, camelToKebabCase, isAtRule } from './helper.js';
-import { SHORTHAND_PROPERTIES } from './shorthand.js';
-
-const ALL_LONGHANDS = new Set(Object.values(SHORTHAND_PROPERTIES).flat());
+import { getPropertyDepth } from './shorthand.js';
 
 function transpileAtomic(property: string, value: string | number, hash: string, pseudo?: string): string {
   if (typeof value === 'string' || typeof value === 'number') {
     const CSSProp = camelToKebabCase(property);
     const applyValue = applyCssValue(value, CSSProp);
-
-    let selector = `.${hash}`;
-    if (ALL_LONGHANDS.has(CSSProp)) {
-      selector += ':not(#\\#)';
-    }
+    let selector = `.${hash}` + ':not(#\\#)'.repeat(getPropertyDepth(CSSProp));
 
     if (pseudo) {
       selector += pseudo;
