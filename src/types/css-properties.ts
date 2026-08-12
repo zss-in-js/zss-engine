@@ -20,7 +20,13 @@ type ColonSelector = {
 
 type Query = `@media ${string}` | `@container ${string}`;
 type QuerySelector = {
-  [K in Query]: BaseCSSProperties | ColonSelector | ArraySelector | CSSVariableProperty;
+  [K in Query]:
+    BaseCSSProperties | ColonSelector | ArraySelector | CSSVariableProperty;
 };
 
-export type CSSProperties = BaseCSSProperties | ArraySelector | ColonSelector | QuerySelector | CSSVariableProperty;
+export type CSSProperties =
+  | BaseCSSProperties
+  | ArraySelector
+  | ColonSelector
+  | QuerySelector
+  | CSSVariableProperty;
