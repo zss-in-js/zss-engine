@@ -13,3 +13,4 @@ export {
   exceptionCamelCase,
 } from './utils/helper.js';
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
+export { impliesCondition } from './utils/parse-conditional-rule.js';
