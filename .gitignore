@@ -4,3 +4,4 @@ dist
 types
 !/src/types
 coverage
+AGENTS.md
