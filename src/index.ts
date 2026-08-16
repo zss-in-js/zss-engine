@@ -14,3 +14,5 @@ export {
 } from './utils/helper.js';
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
 export { impliesCondition } from './utils/parse-conditional-rule.js';
+export type { Specificity } from './utils/specificity.js';
+export { getSpecificity, getPseudoElement } from './utils/specificity.js';
