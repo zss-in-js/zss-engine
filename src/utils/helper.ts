@@ -49,6 +49,8 @@ export const exceptionCamelCase = exception.map((prop) =>
 );
 
 const convertHexToColorName = (value: string): string => {
+  if (/url\(|["']/i.test(value)) return value;
+
   return value.replace(/#[0-9a-fA-F]{3,6}\b/g, (match) => {
     return hexToColorName[match.toLowerCase()] || match;
   });
@@ -68,14 +70,14 @@ export const applyCssValue = (
 };
 
 export const camelToKebabCase = (property: string) => {
+  if (property.startsWith('--')) return property;
+
   // Vendor Start Prefix -ms -moz -webkit
   if (/^(ms|Moz|Webkit)/.test(property)) {
     property = '-' + property;
   }
   return (
     property
-      // Add a hyphen between uppercase letters and numbers (except for cases like HTML2)
-      .replace(/([A-Z]+)([0-9]+)/g, '$1$2') // eg: HTML2 → html2
       // Add a hyphen between lowercase letters, numbers and uppercase letters
       .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
       // Properly handle consecutive uppercase letters (e.g. APIResponse → api-response)
