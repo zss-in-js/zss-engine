@@ -43,6 +43,71 @@ export function transpile(
     return `${indent}${cssProp}: ${value};\n`;
   };
 
+  const atRuleConverter = (
+    className: string,
+    properties: Property,
+    indent: string,
+  ): string => {
+    let nestedRules = '';
+    let regularRules = '';
+    let innerAtRules = '';
+
+    for (const property in properties) {
+      if (Object.prototype.hasOwnProperty.call(properties, property)) {
+        const value = properties[property];
+
+        if (isAtRule(property)) {
+          const innerBody = atRuleConverter(
+            className,
+            value as Property,
+            indent + '  ',
+          );
+          innerAtRules += `${indent}${property} {\n${innerBody}${indent}}\n`;
+          continue;
+        }
+
+        const isColon = property.startsWith(':');
+        const isArray = property.startsWith('[');
+        if (isColon || isArray) {
+          const kebabProperty = camelToKebabCase(property);
+          const increaseKebabProperty = ':not(#\\#)' + kebabProperty;
+          let pseudoClassRule = '';
+
+          if (typeof value === 'object' && value !== null) {
+            for (const pseudoProp in value) {
+              if (Object.prototype.hasOwnProperty.call(value, pseudoProp)) {
+                const CSSProp = camelToKebabCase(pseudoProp);
+                const applyValue = applyCssValue(
+                  value[pseudoProp] as string | number,
+                  CSSProp,
+                );
+                pseudoClassRule += rules(
+                  indent + '  ',
+                  { [pseudoProp]: applyValue },
+                  pseudoProp,
+                );
+              }
+            }
+          }
+          nestedRules += `${indent}${className}${increaseKebabProperty} {\n${pseudoClassRule}${indent}}\n`;
+        } else {
+          const CSSProp = camelToKebabCase(property);
+          const applyValue = applyCssValue(value as string | number, CSSProp);
+          regularRules += rules(
+            indent + '  ',
+            { [property]: applyValue },
+            property,
+          );
+        }
+      }
+    }
+
+    const baseRule = regularRules
+      ? `${indent}${className} {\n${regularRules}${indent}}\n`
+      : '';
+    return baseRule + nestedRules + innerAtRules;
+  };
+
   const stringConverter = (
     className: string,
     properties: Property,
@@ -69,66 +134,11 @@ export function transpile(
           const styles = stringConverter(selector, value, indentLevel);
           Object.assign(classSelector, styles);
         } else if (isAtRule(property)) {
-          const mediaRule = property;
-          let nestedRules = '';
-          let regularRules = '';
-          for (const mediaProp in value) {
-            if (Object.prototype.hasOwnProperty.call(value, mediaProp)) {
-              const mediaValue = value[mediaProp];
-              const isColon = mediaProp.startsWith(':');
-              const isArray = mediaProp.startsWith('[');
-              if (isColon || isArray) {
-                const kebabMediaProp = camelToKebabCase(mediaProp);
-                const increaseKebabMediaProp = ':not(#\\#)' + kebabMediaProp;
-                let pseudoClassRule = '';
-
-                if (typeof mediaValue === 'object' && mediaValue !== null) {
-                  for (const pseudoProp in mediaValue) {
-                    if (
-                      Object.prototype.hasOwnProperty.call(
-                        mediaValue,
-                        pseudoProp,
-                      )
-                    ) {
-                      const CSSProp = camelToKebabCase(pseudoProp);
-                      const applyValue = applyCssValue(
-                        mediaValue[pseudoProp] as string | number,
-                        CSSProp,
-                      );
-                      pseudoClassRule += rules(
-                        innerIndent + '  ',
-                        { [pseudoProp]: applyValue },
-                        pseudoProp,
-                      );
-                    }
-                  }
-                }
-                nestedRules += `${innerIndent}${className}${increaseKebabMediaProp} {\n${pseudoClassRule}${innerIndent}}\n`;
-              } else {
-                const CSSProp = camelToKebabCase(mediaProp);
-                const applyValue = applyCssValue(
-                  mediaValue as string | number,
-                  CSSProp,
-                );
-                regularRules += rules(
-                  innerIndent + '  ',
-                  { [mediaProp]: applyValue },
-                  mediaProp,
-                );
-              }
-            }
-          }
-          if (regularRules) {
-            mediaQueries.push({
-              media: mediaRule,
-              css: `${mediaRule} {\n${innerIndent}${className} {\n${regularRules}  }\n${nestedRules}}\n`,
-            });
-          } else {
-            mediaQueries.push({
-              media: mediaRule,
-              css: `${mediaRule} {\n${nestedRules}}\n`,
-            });
-          }
+          const body = atRuleConverter(className, value, innerIndent);
+          mediaQueries.push({
+            media: property,
+            css: `${property} {\n${body}}\n`,
+          });
         }
       }
     }
