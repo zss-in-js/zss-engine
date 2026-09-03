@@ -26,15 +26,15 @@ function splitAtomicAndNested(
   });
 }
 
-function processAtomicProps(
+function walkAtomicProps(
   flatProps: CSSProperties,
   atomicMap: Map<string, string>,
-  parentAtRule?: string,
+  atRules: string[],
 ) {
   const resultQueue: Array<[string, string | number]> = [];
   for (const [key, style] of Object.entries(flatProps)) {
     if (isAtRule(key)) {
-      processAtomicProps(style as CSSProperties, atomicMap, key);
+      walkAtomicProps(style as CSSProperties, atomicMap, [...atRules, key]);
       continue;
     }
 
@@ -44,20 +44,28 @@ function processAtomicProps(
   for (const [property, value] of resultQueue) {
     const CSSProp = camelToKebabCase(property);
     const normalizedValue = applyCssValue(value, CSSProp);
-    const singlePropObj = { [property]: normalizedValue };
-    const styleObj = parentAtRule
-      ? { [parentAtRule]: singlePropObj }
-      : singlePropObj;
-    const atomicHash = genBase36Hash(styleObj, 1, 8);
+    let hashSource: Record<string, unknown> = { [property]: normalizedValue };
+    for (let i = atRules.length - 1; i >= 0; i--) {
+      hashSource = { [atRules[i]]: hashSource };
+    }
+    const atomicHash = genBase36Hash(hashSource, 1, 8);
 
     if (atomicMap.has(atomicHash)) continue;
 
     let styleSheet = transpileAtomic(property, value, atomicHash);
-    if (parentAtRule) {
-      styleSheet = `${parentAtRule} { ${styleSheet} }`;
+    for (let i = atRules.length - 1; i >= 0; i--) {
+      styleSheet = `${atRules[i]} { ${styleSheet} }`;
     }
     atomicMap.set(atomicHash, styleSheet + '\n');
   }
+}
+
+function processAtomicProps(
+  flatProps: CSSProperties,
+  atomicMap: Map<string, string>,
+  parentAtRule?: string,
+) {
+  walkAtomicProps(flatProps, atomicMap, parentAtRule ? [parentAtRule] : []);
 }
 
 export { splitAtomicAndNested, processAtomicProps };
