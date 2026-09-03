@@ -223,19 +223,28 @@ test('transpile ignores inherited and unsupported keyframe properties', () => {
     '0%': frame,
   });
 
-  const { styleSheet } = transpile({ '@keyframes guarded': keyframes } as unknown as Parameters<typeof transpile>[0], 'test');
+  const { styleSheet } = transpile(
+    { '@keyframes guarded': keyframes } as unknown as Parameters<
+      typeof transpile
+    >[0],
+    'test',
+  );
 
   expect(styleSheet).toContain('opacity: 0;');
   expect(styleSheet).not.toContain('50%');
   expect(styleSheet).not.toContain('color: red;');
-  expect(styleSheet).toContain('@keyframes guarded {\n  0% {\n    opacity: 0;\n  }\n}');
+  expect(styleSheet).toContain(
+    '@keyframes guarded {\n  0% {\n    opacity: 0;\n  }\n}',
+  );
 });
 
 test('transpile ignores inherited properties, unknown at-rules, and invalid query selectors', () => {
   const query = Object.assign(Object.create({ inheritedColor: 'red' }), {
     ':hover': 'invalid',
     ':focus': null,
-    ':active': Object.assign(Object.create({ inheritedOpacity: 0 }), { color: 'green' }),
+    ':active': Object.assign(Object.create({ inheritedOpacity: 0 }), {
+      color: 'green',
+    }),
   });
   const styles = Object.assign(Object.create({ inheritedDisplay: 'block' }), {
     color: 'blue',
@@ -243,7 +252,10 @@ test('transpile ignores inherited properties, unknown at-rules, and invalid quer
     '@media (min-width: 1px)': query,
   });
 
-  const { styleSheet } = transpile({ component: styles } as unknown as Parameters<typeof transpile>[0], 'guarded');
+  const { styleSheet } = transpile(
+    { component: styles } as unknown as Parameters<typeof transpile>[0],
+    'guarded',
+  );
 
   expect(styleSheet).toContain('color: blue;');
   expect(styleSheet).toContain('@media (min-width: 1px)');
@@ -251,4 +263,52 @@ test('transpile ignores inherited properties, unknown at-rules, and invalid quer
   expect(styleSheet).not.toContain('@unknown');
   expect(styleSheet).not.toContain('invalid');
   expect(styleSheet).not.toContain('inherited-opacity');
+});
+
+test('transpile handles nested at-rules', () => {
+  const object = {
+    card: {
+      '@media (min-width: 900px)': {
+        gap: '10px',
+        '@supports (display: grid)': {
+          color: 'red',
+          ':hover': {
+            color: 'blue',
+          },
+        },
+      },
+    },
+  };
+
+  const { styleSheet } = transpile(object, 'x1abcdef');
+
+  expect(styleSheet).toBe(
+    '@media (min-width: 900px) {\n' +
+      '  .x1abcdef {\n' +
+      '    gap: 10px;\n' +
+      '  }\n' +
+      '  @supports (display: grid) {\n' +
+      '    .x1abcdef {\n' +
+      '      color: red;\n' +
+      '    }\n' +
+      '    .x1abcdef:not(#\\#):hover {\n' +
+      '      color: blue;\n' +
+      '    }\n' +
+      '  }\n' +
+      '}\n',
+  );
+});
+
+test('transpile keeps custom property names case-sensitive', () => {
+  const object = {
+    card: {
+      '--fooBar': 'red',
+      color: 'var(--fooBar)',
+    },
+  };
+
+  const { styleSheet } = transpile(object, 'x1abcdef');
+
+  expect(styleSheet).toContain('--fooBar: red;');
+  expect(styleSheet).toContain('color: var(--fooBar);');
 });
