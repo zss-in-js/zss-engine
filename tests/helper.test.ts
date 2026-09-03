@@ -11,6 +11,17 @@ describe('camelToKebabCase', () => {
     expect(camelToKebabCase('MozAppearance')).toBe('-moz-appearance');
     expect(camelToKebabCase('WebkitTransform')).toBe('-webkit-transform');
   });
+
+  test('lowercases trailing digits without inserting a hyphen', () => {
+    expect(camelToKebabCase('HTML2')).toBe('html2');
+    expect(camelToKebabCase('APIResponse')).toBe('api-response');
+  });
+
+  test('preserves the case of custom properties', () => {
+    expect(camelToKebabCase('--fooBar')).toBe('--fooBar');
+    expect(camelToKebabCase('--MyColor')).toBe('--MyColor');
+    expect(camelToKebabCase('--foo-bar')).toBe('--foo-bar');
+  });
 });
 
 describe('applyCssValue', () => {
@@ -27,7 +38,9 @@ describe('applyCssValue', () => {
   test('converts hex codes to color names in string values', () => {
     expect(applyCssValue('#f00', 'color')).toBe('red');
     expect(applyCssValue('#0000ff', 'backgroundColor')).toBe('blue');
-    expect(applyCssValue('linear-gradient(#fff, #000)', 'backgroundImage')).toBe('linear-gradient(white, black)');
+    expect(
+      applyCssValue('linear-gradient(#fff, #000)', 'backgroundImage'),
+    ).toBe('linear-gradient(white, black)');
   });
 
   test('leaves string values without hex codes unchanged', () => {
@@ -41,6 +54,16 @@ describe('applyCssValue', () => {
 
   test('handles undefined color names for hex codes', () => {
     expect(applyCssValue('#123456', 'color')).toBe('#123456');
+  });
+
+  test('skips values holding a url() or a quoted string', () => {
+    expect(applyCssValue('url(#fff)', 'clip-path')).toBe('url(#fff)');
+    expect(applyCssValue('URL(#fff)', 'clip-path')).toBe('URL(#fff)');
+    expect(applyCssValue("'#fff'", 'content')).toBe("'#fff'");
+    expect(applyCssValue('"#fff"', 'content')).toBe('"#fff"');
+    expect(applyCssValue('url(bg.png) #fff', 'background')).toBe(
+      'url(bg.png) #fff',
+    );
   });
 });
 
