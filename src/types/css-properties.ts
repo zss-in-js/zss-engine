@@ -18,10 +18,20 @@ type ColonSelector = {
   [key in ColonString]: BaseCSSProperties | CSSVariableProperty;
 };
 
-type Query = `@media ${string}` | `@container ${string}`;
+type Query =
+  | `@media ${string}`
+  | `@container ${string}`
+  | `@supports ${string}`
+  | `@layer ${string}`
+  | `@scope ${string}`;
+
 type QuerySelector = {
   [K in Query]:
-    BaseCSSProperties | ColonSelector | ArraySelector | CSSVariableProperty;
+    | BaseCSSProperties
+    | ColonSelector
+    | ArraySelector
+    | CSSVariableProperty
+    | QuerySelector;
 };
 
 export type CSSProperties =
