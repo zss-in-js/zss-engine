@@ -1,4 +1,7 @@
-import { processAtomicProps, splitAtomicAndNested } from '../src/utils/processor-atomic';
+import {
+  processAtomicProps,
+  splitAtomicAndNested,
+} from '../src/utils/processor-atomic';
 
 describe('splitAtomicAndNested', () => {
   test('splits atomic and nested properties correctly', () => {
@@ -179,6 +182,66 @@ describe('processAtomicProps', () => {
     );
 
     expect(atomicMap.size).toBe(1);
+  });
+
+  test('keeps the outer at-rule when at-rules are nested', () => {
+    processAtomicProps(
+      {
+        '@media (min-width: 900px)': {
+          '@supports (display: grid)': {
+            color: 'red',
+          },
+        },
+      },
+      atomicMap,
+    );
+
+    expect(atomicMap.size).toBe(1);
+
+    const sheets = Array.from(atomicMap.values()).join('');
+    expect(sheets).toContain(
+      '@media (min-width: 900px) { @supports (display: grid) {',
+    );
+    expect(sheets).toContain('color: red;');
+  });
+
+  test('composes the parent at-rule with a nested at-rule', () => {
+    processAtomicProps(
+      {
+        '@supports (display: grid)': {
+          color: 'red',
+        },
+      },
+      atomicMap,
+      '@media (min-width: 900px)',
+    );
+
+    const sheets = Array.from(atomicMap.values()).join('');
+    expect(sheets).toContain(
+      '@media (min-width: 900px) { @supports (display: grid) {',
+    );
+  });
+
+  test('hashes the whole at-rule chain', () => {
+    const nestedMap = new Map<string, string>();
+    const singleMap = new Map<string, string>();
+
+    processAtomicProps(
+      {
+        '@media (min-width: 900px)': {
+          '@supports (display: grid)': { color: 'red' },
+        },
+      },
+      nestedMap,
+    );
+    processAtomicProps(
+      {
+        '@supports (display: grid)': { color: 'red' },
+      },
+      singleMap,
+    );
+
+    expect([...nestedMap.keys()]).not.toEqual([...singleMap.keys()]);
   });
 
   test('skips duplicate atomic hashes', () => {
