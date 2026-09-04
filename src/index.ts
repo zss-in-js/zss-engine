@@ -8,6 +8,7 @@ export {
 } from './utils/processor-atomic.js';
 export {
   camelToKebabCase,
+  kebabToCamelCase,
   applyCssValue,
   isAtRule,
   exceptionCamelCase,
@@ -16,3 +17,9 @@ export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
 export { impliesCondition } from './utils/parse-conditional-rule.js';
 export type { Specificity } from './utils/specificity.js';
 export { getSpecificity, getPseudoElement } from './utils/specificity.js';
+export type { PropertySpelling } from './utils/logicalPhysical.js';
+export {
+  canonicalProperty,
+  counterpartOf,
+  spellingOf,
+} from './utils/logicalPhysical.js';
