@@ -1,4 +1,9 @@
-import { applyCssValue, camelToKebabCase, isAtRule } from '../src/utils/helper';
+import {
+  applyCssValue,
+  camelToKebabCase,
+  isAtRule,
+  kebabToCamelCase,
+} from '../src/utils/helper';
 
 describe('camelToKebabCase', () => {
   test('converts camelCase to kebab-case', () => {
@@ -24,6 +29,25 @@ describe('camelToKebabCase', () => {
   });
 });
 
+describe('kebabToCamelCase', () => {
+  test('converts kebab-case to camelCase', () => {
+    expect(kebabToCamelCase('font-size')).toBe('fontSize');
+    expect(kebabToCamelCase('background-color')).toBe('backgroundColor');
+    expect(kebabToCamelCase('color')).toBe('color');
+  });
+
+  test('handles vendor prefixes correctly', () => {
+    expect(kebabToCamelCase('-ms-transform')).toBe('msTransform');
+    expect(kebabToCamelCase('-moz-appearance')).toBe('MozAppearance');
+    expect(kebabToCamelCase('-webkit-transform')).toBe('WebkitTransform');
+  });
+
+  test('preserves the case of custom properties', () => {
+    expect(kebabToCamelCase('--foo-bar')).toBe('--foo-bar');
+    expect(kebabToCamelCase('--MyColor')).toBe('--MyColor');
+  });
+});
+
 describe('applyCssValue', () => {
   test('appends "px" to number values for non-exception properties', () => {
     expect(applyCssValue(10, 'width')).toBe('10px');
@@ -33,6 +57,10 @@ describe('applyCssValue', () => {
   test('converts number values to string for exception properties', () => {
     expect(applyCssValue(0.5, 'opacity')).toBe('0.5');
     expect(applyCssValue(700, 'font-weight')).toBe('700');
+  });
+
+  test('does not append "px" to numeric custom property values', () => {
+    expect(applyCssValue(10, '--spacing')).toBe('10');
   });
 
   test('converts hex codes to color names in string values', () => {
