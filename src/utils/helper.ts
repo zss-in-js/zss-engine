@@ -86,6 +86,15 @@ export const camelToKebabCase = (property: string) => {
   );
 };
 
+export const kebabToCamelCase = (property: string) => {
+  if (property.startsWith('--')) return property;
+
+  const camel = property.replace(/-([a-z])/g, (_, letter: string) =>
+    letter.toUpperCase(),
+  );
+  return /^Ms[A-Z]/.test(camel) ? 'ms' + camel.slice(2) : camel;
+};
+
 export const isAtRule = (prop: string) => {
   return (
     prop.startsWith('@media') ||
