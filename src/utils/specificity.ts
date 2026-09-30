@@ -226,6 +226,56 @@ export function getSpecificity(selector: string): Specificity {
   return total;
 }
 
+export function findSameNameNesting(selector: string): string | null {
+  const open: [string, number][] = [];
+  let depth = 0;
+  let index = 0;
+
+  while (index < selector.length) {
+    const char = selector[index];
+
+    if (char === '\\') {
+      index = escapeEnd(selector, index);
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      index = skipString(selector, char, index + 1);
+      continue;
+    }
+    if (char === '[') {
+      index = skipBracket(selector, index);
+      continue;
+    }
+
+    if (char === '(') {
+      depth += 1;
+    } else if (char === ')') {
+      if (open.length > 0 && open[open.length - 1][1] === depth) open.pop();
+      depth = Math.max(depth - 1, 0);
+    } else if (char === ':') {
+      const doubleColon = selector[index + 1] === ':';
+      const nameStart = index + (doubleColon ? 2 : 1);
+      const nameEnd = skipName(selector, nameStart);
+      if (nameEnd > nameStart && selector[nameEnd] === '(') {
+        const name =
+          (doubleColon ? '::' : ':') +
+          selector.slice(nameStart, nameEnd).toLowerCase();
+        if (open.some(([ancestor]) => ancestor === name)) return name;
+        depth += 1;
+        open.push([name, depth]);
+        index = nameEnd + 1;
+        continue;
+      }
+      index = nameEnd;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  return null;
+}
+
 export function getPseudoElement(selector: string): string {
   let index = 0;
 
