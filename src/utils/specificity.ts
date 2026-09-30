@@ -15,11 +15,46 @@ const OF_KEYWORD = /\s+of\s+/;
 
 const isNameChar = (char: string): boolean => /[\w-]/.test(char);
 
+const escapeEnd = (selector: string, start: number): number => {
+  let end = start + 1;
+
+  while (end < selector.length && end - start <= 6) {
+    const code = selector.charCodeAt(end);
+    if (!(
+      (code >= 0x30 && code <= 0x39) ||
+      (code >= 0x41 && code <= 0x46) ||
+      (code >= 0x61 && code <= 0x66)
+    )) {
+      break;
+    }
+    end += 1;
+  }
+
+  if (end === start + 1) {
+    return Math.min(start + 2, selector.length);
+  }
+
+  if (end < selector.length) {
+    const code = selector.charCodeAt(end);
+    if (
+      code === 0x09 ||
+      code === 0x0a ||
+      code === 0x0c ||
+      code === 0x0d ||
+      code === 0x20
+    ) {
+      end += 1;
+    }
+  }
+
+  return end;
+};
+
 const skipName = (selector: string, from: number): number => {
   let index = from;
   while (index < selector.length) {
     if (selector[index] === '\\') {
-      index += 2;
+      index = escapeEnd(selector, index);
       continue;
     }
     if (!isNameChar(selector[index])) break;
