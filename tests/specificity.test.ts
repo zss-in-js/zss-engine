@@ -1,4 +1,8 @@
-import { getPseudoElement, getSpecificity } from '../src/utils/specificity';
+import {
+  findSameNameNesting,
+  getPseudoElement,
+  getSpecificity,
+} from '../src/utils/specificity';
 
 describe('getSpecificity', () => {
   describe('simple selectors', () => {
@@ -45,6 +49,22 @@ describe('getSpecificity', () => {
     it('handles escapes in names and attribute values', () => {
       expect(getSpecificity('.a\\.b[data-x=foo\\]bar]')).toEqual([0, 2, 0]);
       expect(getSpecificity('a[title="say \\\"hello\\\""]')).toEqual([0, 1, 1]);
+    });
+
+    it.each([
+      ['.\\31 item', [0, 1, 0]],
+      ['.\\A item', [0, 1, 0]],
+      ['.\\b item', [0, 1, 0]],
+      ['.\\31\titem', [0, 1, 0]],
+      ['.\\31\nitem', [0, 1, 0]],
+      ['.\\31\fitem', [0, 1, 0]],
+      ['.\\31\ritem', [0, 1, 0]],
+      ['.\\31', [0, 1, 0]],
+      ['.\\31g', [0, 1, 0]],
+      ['.\\g', [0, 1, 0]],
+      ['.\\', [0, 1, 0]],
+    ] as const)('handles the CSS escape in %s', (selector, expected) => {
+      expect(getSpecificity(selector)).toEqual(expected);
     });
 
     it('tolerates an unclosed attribute selector', () => {
@@ -163,5 +183,33 @@ describe('getPseudoElement', () => {
   it('tolerates unclosed brackets and functions', () => {
     expect(getPseudoElement('[data-selector="::before"')).toBe('');
     expect(getPseudoElement('::part(label')).toBe('::part(label');
+  });
+});
+
+describe('findSameNameNesting', () => {
+  it.each([
+    [':is(:where(:not(:has(.a))))', null],
+    [':is(.a):is(.b)', null],
+    ['[data-x=":is(:is(a))"]', null],
+    [':nth-child(2 of :is(.a)):is(.b)', null],
+    [':where(:where(.a), .b)', ':where'],
+    [':is(:where(:is(.a)))', ':is'],
+    [':not(.x, :not(.a))', ':not'],
+    ['::slotted(::slotted(span))', '::slotted'],
+  ])('%s -> %s', (selector, expected) => {
+    expect(findSameNameNesting(selector)).toBe(expected);
+  });
+
+  it.each([
+    ['\\:is(:is(.a))', null],
+    ['":is(:is(.a))"', null],
+    ["':is(:is(.a))'", null],
+    ['(:is(.a))', null],
+    [':is((.a))', null],
+    [':hover', null],
+    [':', null],
+    [')', null],
+  ])('tolerates non-functional syntax in %s', (selector, expected) => {
+    expect(findSameNameNesting(selector)).toBe(expected);
   });
 });
