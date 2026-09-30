@@ -16,7 +16,11 @@ export {
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
 export { impliesCondition } from './utils/parse-conditional-rule.js';
 export type { Specificity } from './utils/specificity.js';
-export { getSpecificity, getPseudoElement } from './utils/specificity.js';
+export {
+  getSpecificity,
+  getPseudoElement,
+  findSameNameNesting,
+} from './utils/specificity.js';
 export type { PropertySpelling } from './utils/logicalPhysical.js';
 export {
   canonicalProperty,
