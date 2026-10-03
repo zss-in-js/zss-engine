@@ -257,12 +257,12 @@ describe('findInvalidNesting', () => {
 describe('stripSelectorComments', () => {
   it.each([
     [':hover', ':hover'],
-    [':is(.a/* #b */, .c)', ':is(.a, .c)'],
-    ['.a/**/.b', '.a.b'],
-    ['[data-x="/* kept */"]/* gone */', '[data-x="/* kept */"]'],
+    [':is(.a/* #b */, .c)', ':is(.a/**/, .c)'],
+    ['.a/**/.b', '.a/**/.b'],
+    ['[data-x="/* kept */"]/* gone */', '[data-x="/* kept */"]/**/'],
     ["[data-x='/*']:hover", "[data-x='/*']:hover"],
     ['.a\\/* not a comment', '.a\\/* not a comment'],
-    [':hover/* unterminated', ':hover'],
+    [':hover/* unterminated', ':hover/**/'],
   ])('%s -> %s', (selector, expected) => {
     expect(stripSelectorComments(selector)).toBe(expected);
   });
@@ -284,5 +284,26 @@ describe('stripSelectorComments', () => {
       0, 1, 0,
     ]);
     expect(getPseudoElement(stripSelectorComments('.a/*::before*/'))).toBe('');
+  });
+});
+
+describe('comments preserve selector token boundaries', () => {
+  it.each(['[data-x=foo/**/i]', ':nth-child(2n/**/of .a)', '.a/**/.b'])(
+    'preserves %s',
+    (selector) => {
+      expect(stripSelectorComments(selector)).toBe(selector);
+    },
+  );
+  it('ignores comments in every selector reader', () => {
+    expect(getSpecificity(':hover/* #a .b */')).toEqual([0, 1, 0]);
+    expect(getSpecificity(':nth-child(2n/**/of .a)')).toEqual([0, 2, 0]);
+    expect(getSpecificity(':nth-child(2n of/**/.a)')).toEqual([0, 2, 0]);
+    expect(getSpecificity(':is([x/* ] */], #a)')).toEqual([1, 0, 0]);
+    expect(getPseudoElement(':is(.a/* ) */)::before')).toBe('::before');
+    expect(getPseudoElement('.a/*::before*/')).toBe('');
+    expect(findInvalidNesting(':is(/* :is( */.a)')).toBeNull();
+    expect(
+      findInvalidNesting(':not(/*)*/'.repeat(65) + '.a' + ')'.repeat(65)),
+    ).toEqual({ kind: 'too-deep' });
   });
 });
