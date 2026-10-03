@@ -243,7 +243,19 @@ export function getSpecificity(selector: string): Specificity {
   return stack[0].sum;
 }
 
+export const MAX_SELECTOR_NESTING = 64;
+
+export type InvalidNesting =
+  { kind: 'same-name'; name: string } | { kind: 'too-deep' };
+
+const TOO_DEEP: InvalidNesting = { kind: 'too-deep' };
+
 export function findSameNameNesting(selector: string): string | null {
+  const nesting = findInvalidNesting(selector);
+  return nesting?.kind === 'same-name' ? nesting.name : null;
+}
+
+export function findInvalidNesting(selector: string): InvalidNesting | null {
   const open: [string, number][] = [];
   let depth = 0;
   let index = 0;
@@ -266,6 +278,7 @@ export function findSameNameNesting(selector: string): string | null {
 
     if (char === '(') {
       depth += 1;
+      if (depth > MAX_SELECTOR_NESTING) return TOO_DEEP;
     } else if (char === ')') {
       if (open.length > 0 && open[open.length - 1][1] === depth) open.pop();
       depth = Math.max(depth - 1, 0);
@@ -277,8 +290,10 @@ export function findSameNameNesting(selector: string): string | null {
         const name =
           (doubleColon ? '::' : ':') +
           selector.slice(nameStart, nameEnd).toLowerCase();
-        if (open.some(([ancestor]) => ancestor === name)) return name;
+        if (name !== ':not' && open.some(([ancestor]) => ancestor === name))
+          return { kind: 'same-name', name };
         depth += 1;
+        if (depth > MAX_SELECTOR_NESTING) return TOO_DEEP;
         open.push([name, depth]);
         index = nameEnd + 1;
         continue;
