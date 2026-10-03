@@ -122,6 +122,8 @@ describe('getSpecificity', () => {
     it.each([
       [':nth-child(odd)', [0, 1, 0]],
       [':nth-child(2 of .item)', [0, 2, 0]],
+      [':nth-child(2 OF .item)', [0, 2, 0]],
+      [':nth-last-child(odd Of #a, .b)', [1, 1, 0]],
       [':nth-last-child(-n + 3 of li.important, #featured)', [1, 1, 0]],
       [':nth-of-type(2 of #ignored)', [0, 1, 0]],
       [':host', [0, 1, 0]],
