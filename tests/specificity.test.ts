@@ -147,6 +147,17 @@ describe('getSpecificity', () => {
   it('normalizes pseudo names case-insensitively for their specificity rules', () => {
     expect(getSpecificity(':IS(.item, #hero):BEFORE')).toEqual([1, 0, 1]);
   });
+
+  it.each([
+    ['(article)', [0, 0, 1]],
+    [':where((#ignored))', [0, 0, 0]],
+    [':where(\\ignored)', [0, 0, 0]],
+    ['"ignored".item', [0, 1, 0]],
+    ["'ignored'#item", [1, 0, 0]],
+    [').item', [0, 1, 0]],
+  ] as const)('tolerates unusual syntax in %s', (selector, expected) => {
+    expect(getSpecificity(selector)).toEqual(expected);
+  });
 });
 
 describe('getPseudoElement', () => {
@@ -183,6 +194,7 @@ describe('getPseudoElement', () => {
 
   it('preserves a functional pseudo-element argument verbatim', () => {
     expect(getPseudoElement('x::part(foo\\)bar)')).toBe('::part(foo\\)bar)');
+    expect(getPseudoElement('x::part(foo(bar))')).toBe('::part(foo(bar))');
   });
 
   it('tolerates unclosed brackets and functions', () => {
