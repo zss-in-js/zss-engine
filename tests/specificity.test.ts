@@ -224,6 +224,10 @@ describe('findInvalidSelector', () => {
   const nest = (open: string, levels: number) =>
     open.repeat(levels) + '.a' + ')'.repeat(levels);
 
+  it('limits nesting to 16 levels', () => {
+    expect(MAX_SELECTOR_NESTING).toBe(16);
+  });
+
   it.each([
     [nest(':not(', MAX_SELECTOR_NESTING)],
     [nest('(', MAX_SELECTOR_NESTING)],
@@ -303,7 +307,11 @@ describe('comments preserve selector token boundaries', () => {
     expect(getPseudoElement('.a/*::before*/')).toBe('');
     expect(findInvalidSelector(':is(/* :is( */.a)')).toBeNull();
     expect(
-      findInvalidSelector(':not(/*)*/'.repeat(65) + '.a' + ')'.repeat(65)),
+      findInvalidSelector(
+        ':not(/*)*/'.repeat(MAX_SELECTOR_NESTING + 1) +
+          '.a' +
+          ')'.repeat(MAX_SELECTOR_NESTING + 1),
+      ),
     ).toEqual({ kind: 'too-deep' });
   });
 });
