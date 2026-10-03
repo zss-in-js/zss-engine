@@ -11,7 +11,15 @@ const MAX_OF_ARGUMENTS = new Set(['is', 'not', 'has']);
 const NTH_WITH_OF = new Set(['nth-child', 'nth-last-child']);
 const ARGUMENT_ADDS_TO_HOST = new Set(['host', 'host-context']);
 const ARGUMENT_ADDS_TO_ELEMENT = new Set(['slotted', 'cue', 'cue-region']);
-const OF_KEYWORD = /\s+of\s+/;
+
+const SUM = 0;
+const HIGHEST = 1;
+const BEFORE_OF = 2;
+const IGNORED = 3;
+
+type Kind = typeof SUM | typeof HIGHEST | typeof BEFORE_OF | typeof IGNORED;
+
+type Frame = { kind: Kind; sum: Specificity; best: Specificity };
 
 const isNameChar = (char: string): boolean => /[\w-]/.test(char);
 
@@ -109,121 +117,126 @@ const skipBracket = (selector: string, open: number): number => {
   return selector.length;
 };
 
-const splitTopLevel = (list: string): string[] => {
-  const parts: string[] = [];
-  let depth = 0;
-  let start = 0;
+const isSpace = (char: string | undefined): boolean =>
+  char !== undefined && /\s/.test(char);
 
-  for (let index = 0; index < list.length; index++) {
-    const char = list[index];
-    if (char === '\\') {
-      index += 1;
-      continue;
-    }
-    if (char === '"' || char === "'") {
-      index = skipString(list, char, index + 1) - 1;
-      continue;
-    }
-    if (char === '(' || char === '[') depth += 1;
-    else if (char === ')' || char === ']') depth -= 1;
-    else if (char === ',' && depth === 0) {
-      parts.push(list.slice(start, index));
-      start = index + 1;
-    }
-  }
+const ofAt = (selector: string, index: number): boolean =>
+  isSpace(selector[index - 1]) &&
+  selector[index + 1] === 'f' &&
+  isSpace(selector[index + 2]);
 
-  parts.push(list.slice(start));
-  return parts;
+const frame = (kind: Kind): Frame => ({
+  kind,
+  sum: [0, 0, 0],
+  best: [0, 0, 0],
+});
+
+const add = (total: Specificity, value: Specificity) => {
+  total[0] += value[0];
+  total[1] += value[1];
+  total[2] += value[2];
 };
 
-const compare = (a: Specificity, b: Specificity): number =>
-  a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+const higher = (a: Specificity, b: Specificity): Specificity =>
+  (b[0] - a[0] || b[1] - a[1] || b[2] - a[2]) > 0 ? b : a;
 
-const highest = (list: string): Specificity =>
-  splitTopLevel(list).reduce<Specificity>(
-    (best, part) => {
-      const current = getSpecificity(part);
-      return compare(current, best) > 0 ? current : best;
-    },
-    [0, 0, 0],
-  );
+const pseudo = (name: string, doubleColon: boolean): [Specificity, Kind] => {
+  if (doubleColon || LEGACY_PSEUDO_ELEMENTS.has(name)) {
+    return [[0, 0, 1], ARGUMENT_ADDS_TO_ELEMENT.has(name) ? HIGHEST : IGNORED];
+  }
+  if (name === 'where') return [[0, 0, 0], IGNORED];
+  if (MAX_OF_ARGUMENTS.has(name)) return [[0, 0, 0], HIGHEST];
+  if (ARGUMENT_ADDS_TO_HOST.has(name)) return [[0, 1, 0], HIGHEST];
+  if (NTH_WITH_OF.has(name)) return [[0, 1, 0], BEFORE_OF];
+  return [[0, 1, 0], IGNORED];
+};
+
+const close = (stack: Frame[]) => {
+  const top = stack.pop() as Frame;
+  if (top.kind === SUM) add(stack[stack.length - 1].sum, top.sum);
+  else if (top.kind === HIGHEST)
+    add(stack[stack.length - 1].sum, higher(top.best, top.sum));
+};
 
 export function getSpecificity(selector: string): Specificity {
-  const total: Specificity = [0, 0, 0];
+  const stack: Frame[] = [frame(SUM)];
   let index = 0;
-
-  const add = (specificity: Specificity) => {
-    total[0] += specificity[0];
-    total[1] += specificity[1];
-    total[2] += specificity[2];
-  };
 
   while (index < selector.length) {
     const char = selector[index];
+    const top = stack[stack.length - 1];
+    const counting = top.kind === SUM || top.kind === HIGHEST;
 
-    if (char === '#') {
-      index = skipName(selector, index + 1);
-      total[0] += 1;
+    if (char === '"' || char === "'") {
+      index = skipString(selector, char, index + 1);
       continue;
     }
-    if (char === '.') {
+    if (char === '\\' && !counting) {
+      index += 2;
+      continue;
+    }
+    if (char === ')') {
+      if (stack.length > 1) close(stack);
+      index += 1;
+      continue;
+    }
+    if (char === '(') {
+      stack.push(frame(counting ? SUM : IGNORED));
+      index += 1;
+      continue;
+    }
+    if (char === 'o' && top.kind === BEFORE_OF && ofAt(selector, index)) {
+      top.kind = HIGHEST;
+      index += 2;
+      continue;
+    }
+    if (!counting) {
+      index += 1;
+      continue;
+    }
+    if (char === ',' && top.kind === HIGHEST) {
+      top.best = higher(top.best, top.sum);
+      top.sum = [0, 0, 0];
+      index += 1;
+      continue;
+    }
+    if (char === '#' || char === '.') {
+      top.sum[char === '#' ? 0 : 1] += 1;
       index = skipName(selector, index + 1);
-      total[1] += 1;
       continue;
     }
     if (char === '[') {
+      top.sum[1] += 1;
       index = skipBracket(selector, index);
-      total[1] += 1;
       continue;
     }
-
     if (char === ':') {
       const doubleColon = selector[index + 1] === ':';
       const nameStart = index + (doubleColon ? 2 : 1);
       const nameEnd = skipName(selector, nameStart);
-      const name = selector.slice(nameStart, nameEnd).toLowerCase();
-      index = nameEnd;
-
-      let inner = '';
-      if (selector[index] === '(') {
-        const close = findClose(selector, index);
-        inner = selector.slice(index + 1, close);
-        index = close + 1;
-      }
-
-      if (doubleColon || LEGACY_PSEUDO_ELEMENTS.has(name)) {
-        total[2] += 1;
-        if (ARGUMENT_ADDS_TO_ELEMENT.has(name)) add(highest(inner));
-        continue;
-      }
-      if (name === 'where') continue;
-      if (MAX_OF_ARGUMENTS.has(name)) {
-        add(highest(inner));
-        continue;
-      }
-
-      total[1] += 1;
-      if (ARGUMENT_ADDS_TO_HOST.has(name)) {
-        add(highest(inner));
-        continue;
-      }
-      if (NTH_WITH_OF.has(name)) {
-        const of = OF_KEYWORD.exec(inner);
-        if (of) add(highest(inner.slice(of.index + of[0].length)));
+      const [own, argument] = pseudo(
+        selector.slice(nameStart, nameEnd).toLowerCase(),
+        doubleColon,
+      );
+      add(top.sum, own);
+      if (selector[nameEnd] === '(') {
+        stack.push(frame(argument));
+        index = nameEnd + 1;
+      } else {
+        index = nameEnd;
       }
       continue;
     }
-
     if (isNameChar(char) || char === '\\') {
+      top.sum[2] += 1;
       index = skipName(selector, index);
-      total[2] += 1;
       continue;
     }
-
     index += 1;
   }
 
-  return total;
+  while (stack.length > 1) close(stack);
+  return stack[0].sum;
 }
 
 export function findSameNameNesting(selector: string): string | null {
