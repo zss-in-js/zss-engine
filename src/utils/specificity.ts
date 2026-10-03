@@ -275,6 +275,11 @@ export function findInvalidNesting(selector: string): InvalidNesting | null {
       index = skipBracket(selector, index);
       continue;
     }
+    if (char === '/' && selector[index + 1] === '*') {
+      const end = selector.indexOf('*/', index + 2);
+      index = end < 0 ? selector.length : end + 2;
+      continue;
+    }
 
     if (char === '(') {
       depth += 1;
