@@ -292,9 +292,12 @@ export function stripSelectorComments(selector: string): string {
 export const MAX_SELECTOR_NESTING = 64;
 
 export type InvalidNesting =
-  { kind: 'same-name'; name: string } | { kind: 'too-deep' };
+  | { kind: 'same-name'; name: string }
+  | { kind: 'too-deep' }
+  | { kind: 'stray-quote' };
 
 const TOO_DEEP: InvalidNesting = { kind: 'too-deep' };
+const STRAY_QUOTE: InvalidNesting = { kind: 'stray-quote' };
 
 export function findSameNameNesting(selector: string): string | null {
   const nesting = findInvalidNesting(selector);
@@ -318,7 +321,12 @@ export function findInvalidNesting(selector: string): InvalidNesting | null {
       continue;
     }
     if (char === '"' || char === "'") {
-      index = skipString(selector, char, index + 1);
+      let end = index + 1;
+      while (end < selector.length && selector[end] !== char) {
+        end += selector[end] === '\\' ? 2 : 1;
+      }
+      if (depth === 0 || end >= selector.length) return STRAY_QUOTE;
+      index = end + 1;
       continue;
     }
     if (char === '[') {
