@@ -15,12 +15,12 @@ export {
 } from './utils/helper.js';
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
 export { impliesCondition } from './utils/parse-conditional-rule.js';
-export type { Specificity, InvalidNesting } from './utils/specificity.js';
+export type { Specificity, InvalidSelector } from './utils/specificity.js';
 export {
   getSpecificity,
   getPseudoElement,
   findSameNameNesting,
-  findInvalidNesting,
+  findInvalidSelector,
   MAX_SELECTOR_NESTING,
   stripSelectorComments,
 } from './utils/specificity.js';
