@@ -22,6 +22,7 @@ export {
   findSameNameNesting,
   findInvalidNesting,
   MAX_SELECTOR_NESTING,
+  stripSelectorComments,
 } from './utils/specificity.js';
 export type { PropertySpelling } from './utils/logicalPhysical.js';
 export {
