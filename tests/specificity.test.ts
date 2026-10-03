@@ -307,3 +307,27 @@ describe('comments preserve selector token boundaries', () => {
     ).toEqual({ kind: 'too-deep' });
   });
 });
+
+describe('findInvalidNesting with quotes', () => {
+  it.each([
+    [':lang("en")'],
+    [':is([data-x="a"], .b)'],
+    ["[data-x='y']:hover"],
+    [':lang("a\\"b")'],
+  ])(
+    'accepts a closed string inside brackets or parentheses in %s',
+    (selector) => {
+      expect(findInvalidNesting(selector)).toBeNull();
+    },
+  );
+
+  it.each([
+    [':hover":is(:is(:is(:is(.x'],
+    [":hover':is(.x)"],
+    ['[data-a]"x"'],
+    [':lang("en)'],
+    [':lang("en\\")'],
+  ])('rejects a stray or unclosed quote in %s', (selector) => {
+    expect(findInvalidNesting(selector)).toEqual({ kind: 'stray-quote' });
+  });
+});
