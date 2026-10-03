@@ -1,5 +1,5 @@
 import {
-  findInvalidNesting,
+  findInvalidSelector,
   findSameNameNesting,
   getPseudoElement,
   MAX_SELECTOR_NESTING,
@@ -220,7 +220,7 @@ describe('findSameNameNesting', () => {
   });
 });
 
-describe('findInvalidNesting', () => {
+describe('findInvalidSelector', () => {
   const nest = (open: string, levels: number) =>
     open.repeat(levels) + '.a' + ')'.repeat(levels);
 
@@ -230,7 +230,7 @@ describe('findInvalidNesting', () => {
     [':is(' + nest(':not(', MAX_SELECTOR_NESTING - 1) + ')'],
     ['[data-x="' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '"]'],
   ])('accepts %s', (selector) => {
-    expect(findInvalidNesting(selector)).toBeNull();
+    expect(findInvalidSelector(selector)).toBeNull();
   });
 
   it.each([
@@ -243,11 +243,11 @@ describe('findInvalidNesting', () => {
       ).join('') + '.a',
     ],
   ])('rejects nesting deeper than the limit in %s', (selector) => {
-    expect(findInvalidNesting(selector)).toEqual({ kind: 'too-deep' });
+    expect(findInvalidSelector(selector)).toEqual({ kind: 'too-deep' });
   });
 
   it('reports same-name nesting', () => {
-    expect(findInvalidNesting(':where(:where(.a))')).toEqual({
+    expect(findInvalidSelector(':where(:where(.a))')).toEqual({
       kind: 'same-name',
       name: ':where',
     });
@@ -273,10 +273,10 @@ describe('stripSelectorComments', () => {
       '.a' +
       ')'.repeat(MAX_SELECTOR_NESTING + 1);
     const inert = ':not(/*' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '*/.a)';
-    expect(findInvalidNesting(stripSelectorComments(hidden))).toEqual({
+    expect(findInvalidSelector(stripSelectorComments(hidden))).toEqual({
       kind: 'too-deep',
     });
-    expect(findInvalidNesting(stripSelectorComments(inert))).toBeNull();
+    expect(findInvalidSelector(stripSelectorComments(inert))).toBeNull();
   });
 
   it('removes selectors inside comments before specificity is counted', () => {
@@ -301,14 +301,14 @@ describe('comments preserve selector token boundaries', () => {
     expect(getSpecificity(':is([x/* ] */], #a)')).toEqual([1, 0, 0]);
     expect(getPseudoElement(':is(.a/* ) */)::before')).toBe('::before');
     expect(getPseudoElement('.a/*::before*/')).toBe('');
-    expect(findInvalidNesting(':is(/* :is( */.a)')).toBeNull();
+    expect(findInvalidSelector(':is(/* :is( */.a)')).toBeNull();
     expect(
-      findInvalidNesting(':not(/*)*/'.repeat(65) + '.a' + ')'.repeat(65)),
+      findInvalidSelector(':not(/*)*/'.repeat(65) + '.a' + ')'.repeat(65)),
     ).toEqual({ kind: 'too-deep' });
   });
 });
 
-describe('findInvalidNesting with quotes', () => {
+describe('findInvalidSelector with quotes', () => {
   it.each([
     [':lang("en")'],
     [':is([data-x="a"], .b)'],
@@ -317,7 +317,7 @@ describe('findInvalidNesting with quotes', () => {
   ])(
     'accepts a closed string inside brackets or parentheses in %s',
     (selector) => {
-      expect(findInvalidNesting(selector)).toBeNull();
+      expect(findInvalidSelector(selector)).toBeNull();
     },
   );
 
@@ -328,6 +328,6 @@ describe('findInvalidNesting with quotes', () => {
     [':lang("en)'],
     [':lang("en\\")'],
   ])('rejects a stray or unclosed quote in %s', (selector) => {
-    expect(findInvalidNesting(selector)).toEqual({ kind: 'stray-quote' });
+    expect(findInvalidSelector(selector)).toEqual({ kind: 'stray-quote' });
   });
 });
