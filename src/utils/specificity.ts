@@ -80,10 +80,19 @@ const skipString = (source: string, quote: string, from: number): number => {
   return Math.min(index + 1, source.length);
 };
 
+const skipComment = (selector: string, from: number): number => {
+  const end = selector.indexOf('*/', from + 2);
+  return end < 0 ? selector.length : end + 2;
+};
+
 const findClose = (selector: string, open: number): number => {
   let depth = 0;
   for (let index = open; index < selector.length; index++) {
     const char = selector[index];
+    if (char === '/' && selector[index + 1] === '*') {
+      index = skipComment(selector, index) - 1;
+      continue;
+    }
     if (char === '\\') {
       index += 1;
       continue;
@@ -104,6 +113,10 @@ const findClose = (selector: string, open: number): number => {
 const skipBracket = (selector: string, open: number): number => {
   for (let index = open + 1; index < selector.length; index++) {
     const char = selector[index];
+    if (char === '/' && selector[index + 1] === '*') {
+      index = skipComment(selector, index) - 1;
+      continue;
+    }
     if (char === '\\') {
       index += 1;
       continue;
@@ -121,9 +134,9 @@ const isSpace = (char: string | undefined): boolean =>
   char !== undefined && /\s/.test(char);
 
 const ofAt = (selector: string, index: number): boolean =>
-  isSpace(selector[index - 1]) &&
+  (isSpace(selector[index - 1]) || selector.slice(index - 2, index) === '*/') &&
   (selector[index + 1] === 'f' || selector[index + 1] === 'F') &&
-  isSpace(selector[index + 2]);
+  (isSpace(selector[index + 2]) || selector.startsWith('/*', index + 2));
 
 const frame = (kind: Kind): Frame => ({
   kind,
@@ -164,6 +177,10 @@ export function getSpecificity(selector: string): Specificity {
 
   while (index < selector.length) {
     const char = selector[index];
+    if (char === '/' && selector[index + 1] === '*') {
+      index = skipComment(selector, index);
+      continue;
+    }
     const top = stack[stack.length - 1];
     const counting = top.kind === SUM || top.kind === HIGHEST;
 
@@ -261,9 +278,8 @@ export function stripSelectorComments(selector: string): string {
       continue;
     }
     if (char === '/' && selector[index + 1] === '*') {
-      result += selector.slice(start, index);
-      const end = selector.indexOf('*/', index + 2);
-      index = end < 0 ? selector.length : end + 2;
+      result += selector.slice(start, index) + '/**/';
+      index = skipComment(selector, index);
       start = index;
       continue;
     }
@@ -292,6 +308,10 @@ export function findInvalidNesting(selector: string): InvalidNesting | null {
 
   while (index < selector.length) {
     const char = selector[index];
+    if (char === '/' && selector[index + 1] === '*') {
+      index = skipComment(selector, index);
+      continue;
+    }
 
     if (char === '\\') {
       index = escapeEnd(selector, index);
@@ -343,6 +363,10 @@ export function getPseudoElement(selector: string): string {
 
   while (index < selector.length) {
     const char = selector[index];
+    if (char === '/' && selector[index + 1] === '*') {
+      index = skipComment(selector, index);
+      continue;
+    }
     if (char === '[') {
       index = skipBracket(selector, index);
       continue;
