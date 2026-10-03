@@ -122,7 +122,7 @@ const isSpace = (char: string | undefined): boolean =>
 
 const ofAt = (selector: string, index: number): boolean =>
   isSpace(selector[index - 1]) &&
-  selector[index + 1] === 'f' &&
+  (selector[index + 1] === 'f' || selector[index + 1] === 'F') &&
   isSpace(selector[index + 2]);
 
 const frame = (kind: Kind): Frame => ({
@@ -185,7 +185,11 @@ export function getSpecificity(selector: string): Specificity {
       index += 1;
       continue;
     }
-    if (char === 'o' && top.kind === BEFORE_OF && ofAt(selector, index)) {
+    if (
+      (char === 'o' || char === 'O') &&
+      top.kind === BEFORE_OF &&
+      ofAt(selector, index)
+    ) {
       top.kind = HIGHEST;
       index += 2;
       continue;
