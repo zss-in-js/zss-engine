@@ -291,20 +291,20 @@ export function stripSelectorComments(selector: string): string {
 
 export const MAX_SELECTOR_NESTING = 64;
 
-export type InvalidNesting =
+export type InvalidSelector =
   | { kind: 'same-name'; name: string }
   | { kind: 'too-deep' }
   | { kind: 'stray-quote' };
 
-const TOO_DEEP: InvalidNesting = { kind: 'too-deep' };
-const STRAY_QUOTE: InvalidNesting = { kind: 'stray-quote' };
+const TOO_DEEP: InvalidSelector = { kind: 'too-deep' };
+const STRAY_QUOTE: InvalidSelector = { kind: 'stray-quote' };
 
 export function findSameNameNesting(selector: string): string | null {
-  const nesting = findInvalidNesting(selector);
+  const nesting = findInvalidSelector(selector);
   return nesting?.kind === 'same-name' ? nesting.name : null;
 }
 
-export function findInvalidNesting(selector: string): InvalidNesting | null {
+export function findInvalidSelector(selector: string): InvalidSelector | null {
   const open: [string, number][] = [];
   let depth = 0;
   let index = 0;
