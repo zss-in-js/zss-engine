@@ -243,6 +243,36 @@ export function getSpecificity(selector: string): Specificity {
   return stack[0].sum;
 }
 
+export function stripSelectorComments(selector: string): string {
+  if (!selector.includes('/*')) return selector;
+  let result = '';
+  let start = 0;
+  let index = 0;
+
+  while (index < selector.length) {
+    const char = selector[index];
+
+    if (char === '\\') {
+      index += 2;
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      index = skipString(selector, char, index + 1);
+      continue;
+    }
+    if (char === '/' && selector[index + 1] === '*') {
+      result += selector.slice(start, index);
+      const end = selector.indexOf('*/', index + 2);
+      index = end < 0 ? selector.length : end + 2;
+      start = index;
+      continue;
+    }
+    index += 1;
+  }
+
+  return result + selector.slice(start);
+}
+
 export const MAX_SELECTOR_NESTING = 64;
 
 export type InvalidNesting =
@@ -273,11 +303,6 @@ export function findInvalidNesting(selector: string): InvalidNesting | null {
     }
     if (char === '[') {
       index = skipBracket(selector, index);
-      continue;
-    }
-    if (char === '/' && selector[index + 1] === '*') {
-      const end = selector.indexOf('*/', index + 2);
-      index = end < 0 ? selector.length : end + 2;
       continue;
     }
 
