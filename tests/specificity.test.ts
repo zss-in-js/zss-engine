@@ -4,6 +4,7 @@ import {
   getPseudoElement,
   MAX_SELECTOR_NESTING,
   getSpecificity,
+  stripSelectorComments,
 } from '../src/utils/specificity';
 
 describe('getSpecificity', () => {
@@ -228,14 +229,12 @@ describe('findInvalidNesting', () => {
     [nest('(', MAX_SELECTOR_NESTING)],
     [':is(' + nest(':not(', MAX_SELECTOR_NESTING - 1) + ')'],
     ['[data-x="' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '"]'],
-    [':not(/*' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '*/.a)'],
   ])('accepts %s', (selector) => {
     expect(findInvalidNesting(selector)).toBeNull();
   });
 
   it.each([
     [nest(':not(', MAX_SELECTOR_NESTING + 1)],
-    [nest(':not(/*)*/', MAX_SELECTOR_NESTING + 1)],
     [nest('(', MAX_SELECTOR_NESTING + 1)],
     [
       Array.from(
@@ -252,5 +251,38 @@ describe('findInvalidNesting', () => {
       kind: 'same-name',
       name: ':where',
     });
+  });
+});
+
+describe('stripSelectorComments', () => {
+  it.each([
+    [':hover', ':hover'],
+    [':is(.a/* #b */, .c)', ':is(.a, .c)'],
+    ['.a/**/.b', '.a.b'],
+    ['[data-x="/* kept */"]/* gone */', '[data-x="/* kept */"]'],
+    ["[data-x='/*']:hover", "[data-x='/*']:hover"],
+    ['.a\\/* not a comment', '.a\\/* not a comment'],
+    [':hover/* unterminated', ':hover'],
+  ])('%s -> %s', (selector, expected) => {
+    expect(stripSelectorComments(selector)).toBe(expected);
+  });
+
+  it('removes parentheses inside comments before nesting is counted', () => {
+    const hidden =
+      ':not(/*)*/'.repeat(MAX_SELECTOR_NESTING + 1) +
+      '.a' +
+      ')'.repeat(MAX_SELECTOR_NESTING + 1);
+    const inert = ':not(/*' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '*/.a)';
+    expect(findInvalidNesting(stripSelectorComments(hidden))).toEqual({
+      kind: 'too-deep',
+    });
+    expect(findInvalidNesting(stripSelectorComments(inert))).toBeNull();
+  });
+
+  it('removes selectors inside comments before specificity is counted', () => {
+    expect(getSpecificity(stripSelectorComments(':hover/* #a .b */'))).toEqual([
+      0, 1, 0,
+    ]);
+    expect(getPseudoElement(stripSelectorComments('.a/*::before*/'))).toBe('');
   });
 });
