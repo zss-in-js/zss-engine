@@ -133,10 +133,41 @@ const skipBracket = (selector: string, open: number): number => {
 const isSpace = (char: string | undefined): boolean =>
   char !== undefined && /\s/.test(char);
 
-const ofAt = (selector: string, index: number): boolean =>
-  (isSpace(selector[index - 1]) || selector.slice(index - 2, index) === '*/') &&
-  (selector[index + 1] === 'f' || selector[index + 1] === 'F') &&
-  (isSpace(selector[index + 2]) || selector.startsWith('/*', index + 2));
+const isOf = (word: string): boolean => {
+  const letters: number[] = [];
+  let index = 0;
+  while (index < word.length) {
+    if (letters.length === 2) return false;
+    if (word[index] === '\\') {
+      const end = escapeEnd(word, index);
+      const hex = /^[0-9a-fA-F]+/.exec(word.slice(index + 1, end));
+      letters.push(
+        hex ? parseInt(hex[0], 16) : (word.codePointAt(index + 1) ?? 0),
+      );
+      index = end;
+    } else {
+      letters.push(word.charCodeAt(index));
+      index += 1;
+    }
+  }
+  return (
+    letters.length === 2 &&
+    (letters[0] | 0x20) === 0x6f &&
+    (letters[1] | 0x20) === 0x66
+  );
+};
+
+const ofAt = (selector: string, index: number): boolean => {
+  if (
+    !(isSpace(selector[index - 1]) || selector.slice(index - 2, index) === '*/')
+  )
+    return false;
+  const end = skipName(selector, index);
+  return (
+    isOf(selector.slice(index, end)) &&
+    !(end < selector.length && selector.charCodeAt(end) >= 0x80)
+  );
+};
 
 const frame = (kind: Kind): Frame => ({
   kind,
@@ -188,6 +219,15 @@ export function getSpecificity(selector: string): Specificity {
       index = skipString(selector, char, index + 1);
       continue;
     }
+    if (
+      (char === 'o' || char === 'O' || char === '\\') &&
+      top.kind === BEFORE_OF &&
+      ofAt(selector, index)
+    ) {
+      top.kind = HIGHEST;
+      index = skipName(selector, index);
+      continue;
+    }
     if (char === '\\' && !counting) {
       index += 2;
       continue;
@@ -200,15 +240,6 @@ export function getSpecificity(selector: string): Specificity {
     if (char === '(') {
       stack.push(frame(counting ? SUM : IGNORED));
       index += 1;
-      continue;
-    }
-    if (
-      (char === 'o' || char === 'O') &&
-      top.kind === BEFORE_OF &&
-      ofAt(selector, index)
-    ) {
-      top.kind = HIGHEST;
-      index += 2;
       continue;
     }
     if (!counting) {
