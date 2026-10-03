@@ -289,7 +289,7 @@ export function stripSelectorComments(selector: string): string {
   return result + selector.slice(start);
 }
 
-export const MAX_SELECTOR_NESTING = 64;
+export const MAX_SELECTOR_NESTING = 16;
 
 export type InvalidSelector =
   | { kind: 'same-name'; name: string }
