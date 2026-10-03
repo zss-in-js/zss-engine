@@ -228,12 +228,14 @@ describe('findInvalidNesting', () => {
     [nest('(', MAX_SELECTOR_NESTING)],
     [':is(' + nest(':not(', MAX_SELECTOR_NESTING - 1) + ')'],
     ['[data-x="' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '"]'],
+    [':not(/*' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '*/.a)'],
   ])('accepts %s', (selector) => {
     expect(findInvalidNesting(selector)).toBeNull();
   });
 
   it.each([
     [nest(':not(', MAX_SELECTOR_NESTING + 1)],
+    [nest(':not(/*)*/', MAX_SELECTOR_NESTING + 1)],
     [nest('(', MAX_SELECTOR_NESTING + 1)],
     [
       Array.from(
