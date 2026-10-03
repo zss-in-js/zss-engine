@@ -1,6 +1,8 @@
 import {
+  findInvalidNesting,
   findSameNameNesting,
   getPseudoElement,
+  MAX_SELECTOR_NESTING,
   getSpecificity,
 } from '../src/utils/specificity';
 
@@ -196,7 +198,8 @@ describe('findSameNameNesting', () => {
     [':nth-child(2 of :is(.a)):is(.b)', null],
     [':where(:where(.a), .b)', ':where'],
     [':is(:where(:is(.a)))', ':is'],
-    [':not(.x, :not(.a))', ':not'],
+    [':not(.x, :not(.a))', null],
+    [':not(:not(:is(:is(.a))))', ':is'],
     ['::slotted(::slotted(span))', '::slotted'],
   ])('%s -> %s', (selector, expected) => {
     expect(findSameNameNesting(selector)).toBe(expected);
@@ -213,5 +216,39 @@ describe('findSameNameNesting', () => {
     [')', null],
   ])('tolerates non-functional syntax in %s', (selector, expected) => {
     expect(findSameNameNesting(selector)).toBe(expected);
+  });
+});
+
+describe('findInvalidNesting', () => {
+  const nest = (open: string, levels: number) =>
+    open.repeat(levels) + '.a' + ')'.repeat(levels);
+
+  it.each([
+    [nest(':not(', MAX_SELECTOR_NESTING)],
+    [nest('(', MAX_SELECTOR_NESTING)],
+    [':is(' + nest(':not(', MAX_SELECTOR_NESTING - 1) + ')'],
+    ['[data-x="' + '('.repeat(MAX_SELECTOR_NESTING + 1) + '"]'],
+  ])('accepts %s', (selector) => {
+    expect(findInvalidNesting(selector)).toBeNull();
+  });
+
+  it.each([
+    [nest(':not(', MAX_SELECTOR_NESTING + 1)],
+    [nest('(', MAX_SELECTOR_NESTING + 1)],
+    [
+      Array.from(
+        { length: MAX_SELECTOR_NESTING + 1 },
+        (_, i) => `:x${i}(`,
+      ).join('') + '.a',
+    ],
+  ])('rejects nesting deeper than the limit in %s', (selector) => {
+    expect(findInvalidNesting(selector)).toEqual({ kind: 'too-deep' });
+  });
+
+  it('reports same-name nesting', () => {
+    expect(findInvalidNesting(':where(:where(.a))')).toEqual({
+      kind: 'same-name',
+      name: ':where',
+    });
   });
 });
