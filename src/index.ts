@@ -15,11 +15,13 @@ export {
 } from './utils/helper.js';
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
 export { impliesCondition } from './utils/parse-conditional-rule.js';
-export type { Specificity } from './utils/specificity.js';
+export type { Specificity, InvalidNesting } from './utils/specificity.js';
 export {
   getSpecificity,
   getPseudoElement,
   findSameNameNesting,
+  findInvalidNesting,
+  MAX_SELECTOR_NESTING,
 } from './utils/specificity.js';
 export type { PropertySpelling } from './utils/logicalPhysical.js';
 export {
