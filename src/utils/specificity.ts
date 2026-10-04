@@ -189,7 +189,6 @@ const escapeValue = (selector: string, start: number, end: number): number => {
     ? 0xfffd
     : value;
 };
-// An escaped identifier decoded and lowercased; empty when it cannot be a keyword.
 const keyword = (selector: string, start: number, end: number): string => {
   let result = '';
   let index = start;
