@@ -134,26 +134,28 @@ for (let code = 0; code < 128; code++) {
   else if (/[0-9-]/.test(char)) IDENT_CLASS[code] = IDENT_BYTE;
 }
 
-const identClass = (selector: string, index: number): number => {
-  if (index >= selector.length) return 0;
-  const code = selector.charCodeAt(index);
-  return code >= 0x80 ? IDENT_BYTE | IDENT_START : IDENT_CLASS[code];
-};
+const isIdentByte = (c: number): boolean =>
+  c >= 0x80 || (IDENT_CLASS[c] & IDENT_BYTE) !== 0;
+
+const isIdentStart = (c: number): boolean =>
+  c >= 0x80 || (IDENT_CLASS[c] & IDENT_START) !== 0;
 
 const validEscape = (selector: string, index: number): boolean =>
   selector[index] === '\\' &&
   (index + 1 >= selector.length || !'\n\r\f'.includes(selector[index + 1]));
 
 const startsIdent = (selector: string, index: number): boolean => {
-  const char = selector[index];
-  if (char === '-')
+  if (index >= selector.length) return false;
+  const c = selector.charCodeAt(index);
+  if (c === 0x2d)
     return (
-      (identClass(selector, index + 1) & IDENT_START) !== 0 ||
+      (index + 1 < selector.length &&
+        isIdentStart(selector.charCodeAt(index + 1))) ||
       selector[index + 1] === '-' ||
       validEscape(selector, index + 1)
     );
-  if (char === '\\') return validEscape(selector, index);
-  return (identClass(selector, index) & IDENT_START) !== 0;
+  if (c === 0x5c) return validEscape(selector, index);
+  return isIdentStart(c);
 };
 
 let identEscaped = false;
@@ -161,7 +163,8 @@ const skipIdent = (selector: string, from: number): number => {
   let index = from;
   identEscaped = false;
   for (;;) {
-    while (identClass(selector, index) & IDENT_BYTE) index += 1;
+    while (index < selector.length && isIdentByte(selector.charCodeAt(index)))
+      index += 1;
     if (!validEscape(selector, index)) return index;
     index = escapeEnd(selector, index);
     identEscaped = true;
@@ -187,11 +190,7 @@ const escapeValue = (selector: string, start: number, end: number): number => {
     : value;
 };
 // An escaped identifier decoded and lowercased; empty when it cannot be a keyword.
-const decodeKeyword = (
-  selector: string,
-  start: number,
-  end: number,
-): string => {
+const keyword = (selector: string, start: number, end: number): string => {
   let result = '';
   let index = start;
   while (index < end) {
@@ -254,15 +253,15 @@ const HOST: [Specificity, Kind] = [[0, 1, 0], HIGHEST];
 const NTH: [Specificity, Kind] = [[0, 1, 0], BEFORE_OF];
 const CLASS: [Specificity, Kind] = [[0, 1, 0], IGNORED];
 
-// Pseudo rules looked up by length and first letter, so a name is compared once.
-const pseudoAt = (
+// Rules looked up by the name's length and first letter, so a name is compared once.
+const pseudo = (
   selector: string,
   start: number,
   end: number,
   escaped: boolean,
   doubleColon: boolean,
 ): [Specificity, Kind] => {
-  const decoded = escaped ? decodeKeyword(selector, start, end) : null;
+  const decoded = escaped ? keyword(selector, start, end) : null;
   const is = (word: string) => identIs(selector, start, end, decoded, word);
   const length = decoded === null ? end - start : decoded.length;
   const first =
@@ -274,32 +273,19 @@ const pseudoAt = (
       ? ELEMENT_WITH_ARGUMENT
       : ELEMENT;
   }
-  switch (length) {
-    case 2:
-      return first === 0x69 && is('is') ? HIGHEST_ARGUMENT : CLASS;
-    case 3:
-      return (first === 0x6e && is('not')) || (first === 0x68 && is('has'))
-        ? HIGHEST_ARGUMENT
-        : CLASS;
-    case 4:
-      return first === 0x68 && is('host') ? HOST : CLASS;
-    case 5:
-      if (first === 0x77 && is('where')) return WHERE;
-      return first === 0x61 && is('after') ? ELEMENT : CLASS;
-    case 6:
-      return first === 0x62 && is('before') ? ELEMENT : CLASS;
-    case 9:
-      return first === 0x6e && is('nth-child') ? NTH : CLASS;
-    case 10:
-      return first === 0x66 && is('first-line') ? ELEMENT : CLASS;
-    case 12:
-      if (first === 0x68 && is('host-context')) return HOST;
-      return first === 0x66 && is('first-letter') ? ELEMENT : CLASS;
-    case 14:
-      return first === 0x6e && is('nth-last-child') ? NTH : CLASS;
-    default:
-      return CLASS;
-  }
+  if (length === 2 && first === 0x69 && is('is')) return HIGHEST_ARGUMENT;
+  if (length === 3 && first === 0x6e && is('not')) return HIGHEST_ARGUMENT;
+  if (length === 3 && first === 0x68 && is('has')) return HIGHEST_ARGUMENT;
+  if (length === 4 && first === 0x68 && is('host')) return HOST;
+  if (length === 5 && first === 0x77 && is('where')) return WHERE;
+  if (length === 5 && first === 0x61 && is('after')) return ELEMENT;
+  if (length === 6 && first === 0x62 && is('before')) return ELEMENT;
+  if (length === 9 && first === 0x6e && is('nth-child')) return NTH;
+  if (length === 10 && first === 0x66 && is('first-line')) return ELEMENT;
+  if (length === 12 && first === 0x68 && is('host-context')) return HOST;
+  if (length === 12 && first === 0x66 && is('first-letter')) return ELEMENT;
+  if (length === 14 && first === 0x6e && is('nth-last-child')) return NTH;
+  return CLASS;
 };
 const close = (stack: Frame[]) => {
   const top = stack.pop() as Frame;
@@ -321,9 +307,9 @@ export function getSpecificity(selector: string): Specificity {
     const ident =
       char === '\\' || char === '-'
         ? startsIdent(selector, index)
-        : (identClass(selector, index) &
-            (top.kind === BEFORE_OF ? IDENT_BYTE : IDENT_START)) !==
-          0;
+        : top.kind === BEFORE_OF
+          ? isIdentByte(selector.charCodeAt(index))
+          : isIdentStart(selector.charCodeAt(index));
     if (ident) {
       const end = skipIdent(selector, index);
       if (selector[end] === '(') {
@@ -332,9 +318,7 @@ export function getSpecificity(selector: string): Specificity {
         continue;
       }
       if (top.kind === BEFORE_OF) {
-        const decoded = identEscaped
-          ? decodeKeyword(selector, index, end)
-          : null;
+        const decoded = identEscaped ? keyword(selector, index, end) : null;
         if (identIs(selector, index, end, decoded, 'of')) top.kind = HIGHEST;
       } else if (counting) {
         top.sum[2] += 1;
@@ -369,7 +353,8 @@ export function getSpecificity(selector: string): Specificity {
       (char === '#' || char === '.') &&
       (startsIdent(selector, index + 1) ||
         (char === '#' &&
-          ((identClass(selector, index + 1) & IDENT_BYTE) !== 0 ||
+          ((index + 1 < selector.length &&
+            isIdentByte(selector.charCodeAt(index + 1))) ||
             validEscape(selector, index + 1))))
     ) {
       if (counting) top.sum[char === '#' ? 0 : 1] += 1;
@@ -395,7 +380,7 @@ export function getSpecificity(selector: string): Specificity {
       const escaped = identEscaped;
       const isFunction = selector[nameEnd] === '(';
       if (counting) {
-        const [own, argument] = pseudoAt(
+        const [own, argument] = pseudo(
           selector,
           nameStart,
           nameEnd,
