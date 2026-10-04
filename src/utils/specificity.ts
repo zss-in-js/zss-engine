@@ -251,7 +251,6 @@ const HOST: [Specificity, Kind] = [[0, 1, 0], HIGHEST];
 const NTH: [Specificity, Kind] = [[0, 1, 0], BEFORE_OF];
 const CLASS: [Specificity, Kind] = [[0, 1, 0], IGNORED];
 
-// Rules looked up by the name's length and first letter, so a name is compared once.
 const pseudo = (
   selector: string,
   start: number,
