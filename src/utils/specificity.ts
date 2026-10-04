@@ -300,7 +300,6 @@ export function getSpecificity(selector: string): Specificity {
     const top = stack[stack.length - 1];
     const counting = top.kind === SUM || top.kind === HIGHEST;
 
-    // Inside `:nth-child(` a word may start with a digit, so `1of` stays one word.
     const ident =
       char === '\\' || char === '-'
         ? startsIdent(selector, index)
