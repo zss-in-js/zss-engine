@@ -210,7 +210,6 @@ const keyword = (selector: string, start: number, end: number): string => {
   return result;
 };
 
-// Whether the identifier at start..end is word (lowercase ASCII), without slicing it.
 const identIs = (
   selector: string,
   start: number,
