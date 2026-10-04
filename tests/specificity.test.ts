@@ -73,6 +73,21 @@ describe('getSpecificity', () => {
     it('tolerates an unclosed attribute selector', () => {
       expect(getSpecificity('div[data-value="unterminated')).toEqual([0, 1, 1]);
     });
+
+    it.each([
+      ['-item', [0, 0, 1]],
+      ['--item', [0, 0, 1]],
+      ['-\\item', [0, 0, 1]],
+      ['-', [0, 0, 0]],
+      ['#1', [1, 0, 0]],
+      ['#-', [1, 0, 0]],
+      ['#\\', [1, 0, 0]],
+      ['#é', [1, 0, 0]],
+      ['.é', [0, 1, 0]],
+      ['#', [0, 0, 0]],
+    ] as const)('handles identifier boundaries in %s', (selector, expected) => {
+      expect(getSpecificity(selector)).toEqual(expected);
+    });
   });
 
   describe('selector-list pseudo-classes', () => {
@@ -159,6 +174,31 @@ describe('getSpecificity', () => {
   });
 
   it.each([
+    [':\\is(#id)', [1, 0, 0]],
+    [':\\69S(#id)', [1, 0, 0]],
+    [':\\0(#id)', [0, 1, 0]],
+    [':\\110000(#id)', [0, 1, 0]],
+    [':\\d800(#id)', [0, 1, 0]],
+    [':é(#id)', [0, 1, 0]],
+    [':\\', [0, 1, 0]],
+  ] as const)('decodes escaped pseudo names in %s', (selector, expected) => {
+    expect(getSpecificity(selector)).toEqual(expected);
+  });
+
+  it('counts generic functions and ignores excluded pseudo-element arguments', () => {
+    expect(getSpecificity(':where([x]:hover(foo) bar(baz))')).toEqual([
+      0, 0, 0,
+    ]);
+    expect(getSpecificity('foo(bar)')).toEqual([0, 0, 1]);
+    expect(getSpecificity('::part(:hover)')).toEqual([0, 0, 1]);
+  });
+
+  it('tolerates incomplete pseudo-class names', () => {
+    expect(getSpecificity(':')).toEqual([0, 0, 0]);
+    expect(getSpecificity('::')).toEqual([0, 0, 0]);
+  });
+
+  it.each([
     ['(article)', [0, 0, 1]],
     [':where((#ignored))', [0, 0, 0]],
     [':where(\\ignored)', [0, 0, 0]],
@@ -224,6 +264,7 @@ describe('findSameNameNesting', () => {
     [':not(.x, :not(.a))', null],
     [':not(:not(:is(:is(.a))))', ':is'],
     ['::slotted(::slotted(span))', '::slotted'],
+    [':a\\62(:a\\62(.a))', ':a\\62'],
   ])('%s -> %s', (selector, expected) => {
     expect(findSameNameNesting(selector)).toBe(expected);
   });
