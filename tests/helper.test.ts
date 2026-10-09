@@ -1,6 +1,7 @@
 import {
   applyCssValue,
   camelToKebabCase,
+  exceptionCamelCase,
   isAtRule,
   kebabToCamelCase,
 } from '../src/utils/helper';
@@ -57,6 +58,20 @@ describe('applyCssValue', () => {
   test('converts number values to string for exception properties', () => {
     expect(applyCssValue(0.5, 'opacity')).toBe('0.5');
     expect(applyCssValue(700, 'font-weight')).toBe('700');
+  });
+
+  test('keeps line counts and orders unitless, prefixed or not', () => {
+    expect(applyCssValue(2, 'line-clamp')).toBe('2');
+    expect(applyCssValue(2, '-webkit-line-clamp')).toBe('2');
+    expect(applyCssValue(1, 'reading-order')).toBe('1');
+    expect(applyCssValue(1, '-webkit-box-flex')).toBe('1');
+    expect(applyCssValue(1, '-webkit-flex-grow')).toBe('1');
+  });
+
+  test('lists the exception properties in camelCase with prefixes capitalized', () => {
+    expect(exceptionCamelCase).toContain('WebkitLineClamp');
+    expect(exceptionCamelCase).toContain('lineClamp');
+    expect(exceptionCamelCase).toContain('WebkitBoxOrdinalGroup');
   });
 
   test('does not append "px" to numeric custom property values', () => {
