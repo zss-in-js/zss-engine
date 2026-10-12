@@ -14,7 +14,10 @@ export {
   exceptionCamelCase,
 } from './utils/helper.js';
 export { DIRECT_LONGHANDS } from './utils/shorthand-graph.js';
-export { impliesCondition } from './utils/parse-conditional-rule.js';
+export {
+  impliesCondition,
+  parseConditionalRange,
+} from './utils/parse-conditional-rule.js';
 export type { Specificity, InvalidSelector } from './utils/specificity.js';
 export {
   getSpecificity,
