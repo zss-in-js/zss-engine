@@ -279,7 +279,9 @@ const mergeBounds = (
   return true;
 };
 
-const parseConditionalRange = (condition: string): ConditionalRange | null => {
+export const parseConditionalRange = (
+  condition: string,
+): ConditionalRange | null => {
   const reader = new Reader(condition.trim());
 
   let kind: RuleKind;
