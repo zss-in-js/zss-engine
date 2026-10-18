@@ -22,7 +22,7 @@ type Query =
   | `@media ${string}`
   | `@container ${string}`
   | `@supports ${string}`
-  | `@starting-style ${string}`;
+  | '@starting-style';
 
 type QuerySelector = {
   [K in Query]:
