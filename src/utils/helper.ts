@@ -124,7 +124,6 @@ export const isAtRule = (prop: string) => {
     prop.startsWith('@media') ||
     prop.startsWith('@container') ||
     prop.startsWith('@supports') ||
-    prop.startsWith('@layer') ||
-    prop.startsWith('@scope')
+    prop.startsWith('@starting-style')
   );
 };
