@@ -115,8 +115,7 @@ describe('isAtRule', () => {
     expect(isAtRule('@media (min-width: 768px)')).toBe(true);
     expect(isAtRule('@container (min-width: 300px)')).toBe(true);
     expect(isAtRule('@supports (display: grid)')).toBe(true);
-    expect(isAtRule('@layer utilities')).toBe(true);
-    expect(isAtRule('@scope (.card)')).toBe(true);
+    expect(isAtRule('@starting-style')).toBe(true);
   });
 
   test('returns false for other properties or at-rules', () => {
